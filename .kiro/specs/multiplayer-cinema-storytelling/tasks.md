@@ -15,18 +15,31 @@
   - Set up environment variables for OpenAI API and Redis connection
   - _Requirements: 8.1, 8.2_
 
-- [ ] 2. Create movie data structure and management system
-  - Create JSON files for movie data with characters and checkpoints structure
-  - Implement movie loading utilities and validation functions
-  - Create sample movie data (Harry Potter) with characters and story checkpoints
-  - Write unit tests for movie data loading and validation
+- [x] 2. Create landing page and navigation
+
+
+
+
+
+
+  - Build HomePage component with game mode selection (single player / multiplayer)
+  - Create navigation layout with responsive design
+  - Implement movie selection interface with movie cards
+  - Add basic styling with Tailwind CSS
+  - _Requirements: 1.1, 4.1, 7.1_
+
+- [ ] 3. Implement movie data structure and management
+  - Create simple JSON structure for movie metadata (title, description, characters)
+  - Build movie loading utilities to read from data/movies/ directory
+  - Create sample movie data files for initial testing
+  - Implement movie list display component
   - _Requirements: 8.1, 8.2, 2.1_
 
-- [ ] 3. Implement core data models and interfaces
-  - Define TypeScript interfaces for GameRoom, Player, StoryState, and Movie structures
-  - Create validation functions for all data models
-  - Implement utility functions for game state management
-  - Write unit tests for data model validation and utilities
+- [ ] 4. Implement core data models and game state
+  - Define JavaScript objects for GameSession, Player, and StoryState structures
+  - Create validation functions for game data
+  - Implement utility functions for session management (single and multiplayer)
+  - Build session state management without TypeScript
   - _Requirements: 1.2, 2.2, 3.1, 5.1_
 
 - [ ] 4. Set up Redis integration and room management

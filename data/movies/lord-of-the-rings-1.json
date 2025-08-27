@@ -1,0 +1,62 @@
+{
+  "id": "lord-of-the-rings-1",
+  "title": "The Lord of the Rings: The Fellowship of the Ring",
+  "description": "A hobbit inherits a mysterious ring and must embark on a perilous journey to destroy it and save Middle-earth.",
+  "genre": "Fantasy",
+  "duration": "178 minutes",
+  "image": "/images/movies/lotr-1.jpg",
+  "characters": [
+    {
+      "id": "frodo",
+      "name": "Frodo Baggins",
+      "description": "Hobbit ring-bearer on a quest to save Middle-earth",
+      "avatar": "/images/characters/frodo.jpg",
+      "personality": "brave, compassionate, determined"
+    },
+    {
+      "id": "gandalf",
+      "name": "Gandalf the Grey",
+      "description": "Wise wizard and guide to the Fellowship",
+      "avatar": "/images/characters/gandalf.jpg",
+      "personality": "wise, powerful, protective"
+    },
+    {
+      "id": "aragorn",
+      "name": "Aragorn",
+      "description": "Ranger and rightful heir to the throne of Gondor",
+      "avatar": "/images/characters/aragorn.jpg",
+      "personality": "noble, skilled, reluctant_leader"
+    },
+    {
+      "id": "boromir",
+      "name": "Boromir",
+      "description": "Warrior of Gondor torn between duty and temptation",
+      "avatar": "/images/characters/boromir.jpg",
+      "personality": "proud, conflicted, protective"
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "checkpoint-1",
+      "position": 1,
+      "context": "Frodo learns the truth about the One Ring",
+      "characterChoices": {
+        "frodo": [
+          {
+            "id": "choice-1a",
+            "text": "Accept the burden immediately and prepare to leave",
+            "impact": "quick acceptance",
+            "consequences": ["resolve", "urgency"]
+          },
+          {
+            "id": "choice-1b",
+            "text": "Ask for time to consider the enormous responsibility",
+            "impact": "thoughtful hesitation",
+            "consequences": ["contemplation", "fear"]
+          }
+        ]
+      }
+    }
+  ],
+  "baseScript": "In the peaceful Shire, Frodo Baggins inherits more than just his uncle Bilbo's home - he inherits a ring of immense power..."
+}

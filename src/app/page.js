@@ -6,40 +6,7 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import FeatureCard from '../components/game/FeatureCard';
 import MovieSection from '../components/game/MovieSection';
-
-// Sample movie data for the landing page
-const featuredMovies = [
-  {
-    id: 'harry-potter-1',
-    title: 'Harry Potter and the Philosopher\'s Stone',
-    description: 'Join Harry on his magical journey to Hogwarts and discover alternate paths in the wizarding world.',
-    characters: [
-      { id: 'harry', name: 'Harry Potter' },
-      { id: 'hermione', name: 'Hermione Granger' },
-      { id: 'ron', name: 'Ron Weasley' }
-    ]
-  },
-  {
-    id: 'star-wars-4',
-    title: 'Star Wars: A New Hope',
-    description: 'Experience the galaxy far, far away and reshape the destiny of the Rebel Alliance.',
-    characters: [
-      { id: 'luke', name: 'Luke Skywalker' },
-      { id: 'leia', name: 'Princess Leia' },
-      { id: 'han', name: 'Han Solo' }
-    ]
-  },
-  {
-    id: 'lord-of-the-rings-1',
-    title: 'The Lord of the Rings: The Fellowship',
-    description: 'Guide the Fellowship through Middle-earth and create new paths to destroy the One Ring.',
-    characters: [
-      { id: 'frodo', name: 'Frodo Baggins' },
-      { id: 'gandalf', name: 'Gandalf' },
-      { id: 'aragorn', name: 'Aragorn' }
-    ]
-  }
-];
+import { getFeaturedMovies } from '../lib/movies';
 
 const features = [
   {
@@ -80,7 +47,8 @@ const features = [
   }
 ];
 
-export default function Home() {
+export default async function Home() {
+  const featuredMovies = await getFeaturedMovies();
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       {/* Animated Background */}
@@ -223,9 +191,11 @@ export default function Home() {
             <MovieSection movies={featuredMovies} />
 
             <div className="text-center mt-12">
-              <Button variant="secondary" size="lg">
-                View All Movies
-              </Button>
+              <Link href="/movies">
+                <Button variant="secondary" size="lg">
+                  View All Movies
+                </Button>
+              </Link>
             </div>
           </Container>
         </section>

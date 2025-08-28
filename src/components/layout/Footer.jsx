@@ -38,7 +38,7 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#movies" className="text-gray-300 hover:text-white text-sm transition-colors duration-200">
+                  <Link href="/movies" className="text-gray-300 hover:text-white text-sm transition-colors duration-200">
                     Available Movies
                   </Link>
                 </li>

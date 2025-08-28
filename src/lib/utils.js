@@ -1,6 +1,15 @@
 // Utility functions for the application
 
 /**
+ * Combine class names conditionally
+ * @param {...(string|undefined|null|false)} classes - Class names to combine
+ * @returns {string} Combined class names
+ */
+export function cn(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
+/**
  * Generate a random room code
  * @param {number} length - Length of the room code
  * @returns {string} Random room code

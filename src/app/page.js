@@ -50,12 +50,12 @@ const features = [
 export default async function Home() {
   const featuredMovies = await getFeaturedMovies();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      {/* Animated Background */}
+    <div className="min-h-screen relative">
+      {/* Cinematic Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-red-600/10 to-amber-500/5 rounded-full filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-amber-500/8 to-red-600/5 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-white/3 to-transparent rounded-full filter blur-3xl"></div>
       </div>
 
       <Header />
@@ -65,9 +65,9 @@ export default async function Home() {
         <section className="py-20 sm:py-32">
           <Container>
             <div className="text-center">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
-                Rewrite Your Favorite
-                <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                <span className="modern-text">Rewrite Your Favorite</span>
+                <span className="block accent-text font-black">
                   Movie Stories
                 </span>
               </h1>

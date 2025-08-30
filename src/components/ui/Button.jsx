@@ -14,10 +14,10 @@ const Button = forwardRef(({
     const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variants = {
-        primary: 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500',
-        secondary: 'bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white shadow-lg hover:shadow-xl focus:ring-white/50',
-        outline: 'border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white focus:ring-purple-500',
-        ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500'
+        primary: 'modern-button',
+        secondary: 'glass-card text-white hover:bg-white/10 border border-white/20',
+        outline: 'border-2 border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white focus:ring-indigo-500 transition-all duration-300',
+        ghost: 'text-gray-400 hover:text-white hover:bg-white/5 focus:ring-gray-500'
     };
 
     const sizes = {

@@ -105,6 +105,18 @@ export const useSocket = () => {
     }
   };
 
+  const sendMessage = (text) => {
+    if (socket) {
+      socket.emit('send-message', { text });
+    }
+  };
+
+  const sendAction = (action) => {
+    if (socket) {
+      socket.emit('player-action', { action });
+    }
+  };
+
   return {
     socket,
     isConnected,
@@ -114,6 +126,8 @@ export const useSocket = () => {
     startCharacterSelection,
     startStory,
     makeChoice,
+    sendMessage,
+    sendAction,
     onSessionUpdate
   };
 };

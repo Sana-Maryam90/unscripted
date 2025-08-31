@@ -31,39 +31,39 @@ const GameRoom = ({ session, playerId, onSessionUpdate }) => {
   switch (session.state) {
     case 'waiting':
       return (
-        <WaitingRoom 
+        <WaitingRoom
           session={session}
           currentPlayer={currentPlayer}
           onSessionUpdate={onSessionUpdate}
         />
       );
-    
+
     case 'character_selection':
       return (
-        <CharacterSelection 
+        <CharacterSelection
           session={session}
           currentPlayer={currentPlayer}
           onSessionUpdate={onSessionUpdate}
         />
       );
-    
+
     case 'in_progress':
       return (
-        <StoryProgression 
+        <StoryProgression
           session={session}
           currentPlayer={currentPlayer}
           onSessionUpdate={onSessionUpdate}
         />
       );
-    
+
     case 'completed':
       return (
-        <GameComplete 
+        <GameComplete
           session={session}
           currentPlayer={currentPlayer}
         />
       );
-    
+
     case 'paused':
       return (
         <div className="min-h-screen flex items-center justify-center">
@@ -81,15 +81,15 @@ const GameRoom = ({ session, playerId, onSessionUpdate }) => {
               <div className="animate-pulse">
                 <div className="flex justify-center space-x-1">
                   <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             </Card>
           </Container>
         </div>
       );
-    
+
     default:
       return (
         <div className="min-h-screen flex items-center justify-center">

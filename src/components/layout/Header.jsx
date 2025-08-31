@@ -31,6 +31,9 @@ const Header = () => {
             <Link href="/movies" className="text-gray-300 hover:text-white transition-colors duration-200">
               Movies
             </Link>
+            <Link href="/test-chat" className="text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
+              Test Chat
+            </Link>
           </nav>
 
           {/* CTA Button */}

@@ -39,7 +39,7 @@ export default function TestChatPage() {
     localStorage.setItem('playerName', playerName);
     
     // Generate room code
-    const newRoomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     setRoomCode(newRoomCode);
     setIsInRoom(true);
     setIsCreating(false);

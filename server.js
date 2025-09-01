@@ -44,17 +44,18 @@ app.prepare().then(() => {
 
         // Handle room creation
         socket.on('create-room', (data) => {
+            console.log('🎮 Create room request:', data);
             const { movieId, mode, playerName, playerId } = data;
 
-            const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             const roomId = `room_${roomCode}`;
 
             const gameSession = {
                 id: roomId,
                 roomCode,
-                movieId,
-                mode,
-                state: 'waiting',
+                movieId: movieId || null,
+                mode: mode || 'multiplayer-game',
+                state: 'waiting', // waiting -> movie-selection -> character-selection -> playing -> completed
                 players: [{
                     id: playerId,
                     name: playerName,
@@ -62,14 +63,23 @@ app.prepare().then(() => {
                     isHost: true,
                     characterId: null,
                     status: 'online',
+                    isReady: false,
                     joinedAt: new Date()
                 }],
-                messages: [], // Add chat messages
+                messages: [], // Chat messages
+                selectedMovie: null,
                 currentTurn: null,
+                turnOrder: [],
                 storyProgress: {
                     currentCheckpoint: 0,
                     completedChoices: [],
-                    generatedContent: []
+                    generatedContent: [],
+                    storyHistory: []
+                },
+                gameSettings: {
+                    maxPlayers: 4,
+                    turnTimeLimit: 60, // seconds
+                    allowSpectators: false
                 },
                 createdAt: new Date()
             };
@@ -78,9 +88,13 @@ app.prepare().then(() => {
             activeConnections.set(socket.id, { playerId, roomId });
 
             socket.join(roomId);
-            socket.emit('room-created', { roomCode, session: gameSession });
+            socket.emit('room-created', {
+                roomCode,
+                playerId,
+                session: gameSession
+            });
 
-            console.log(`Room ${roomCode} created by ${playerName}`);
+            console.log(`🎮 Game room ${roomCode} created by ${playerName}`);
         });
 
         // Handle room joining
@@ -123,6 +137,7 @@ app.prepare().then(() => {
             if (existingPlayer) {
                 // Update socket ID for reconnection
                 existingPlayer.socketId = socket.id;
+                existingPlayer.status = 'online'; // Mark as online again
                 activeConnections.set(socket.id, { playerId, roomId });
                 socket.join(roomId);
                 socket.emit('room-joined', {
@@ -134,6 +149,10 @@ app.prepare().then(() => {
                         players: session.players
                     }
                 });
+
+                // Notify other players of reconnection
+                socket.to(roomId).emit('session-updated', session);
+                console.log(`🔄 ${playerName} reconnected to room ${roomCode}`);
                 return;
             }
 
@@ -297,6 +316,280 @@ app.prepare().then(() => {
             });
         });
 
+        // Handle ready toggle
+        socket.on('toggle-ready', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (player) {
+                player.isReady = !player.isReady;
+                io.to(roomId).emit('session-updated', session);
+
+                console.log(`🎯 ${player.name} is ${player.isReady ? 'ready' : 'not ready'} in room ${session.roomCode}`);
+            }
+        });
+
+        // Handle movie selection
+        socket.on('select-movie', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player) return;
+
+            // Update session with selected movie
+            session.selectedMovie = data.movie;
+            session.movieId = data.movieId;
+
+            // Notify all players
+            io.to(roomId).emit('movie-selected', {
+                movie: data.movie,
+                playerName: player.name,
+                session
+            });
+
+            console.log(`🎬 ${player.name} selected movie \"${data.movie.title}\" in room ${session.roomCode}`);
+        });
+
+        // Handle game start
+        socket.on('start-game', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) {
+                socket.emit('error', { message: 'Only the host can start the game' });
+                return;
+            }
+
+            if (!session.selectedMovie) {
+                socket.emit('error', { message: 'Please select a movie first' });
+                return;
+            }
+
+            // Update game state
+            session.state = 'character-selection';
+
+            // Notify all players
+            io.to(roomId).emit('game-started', {
+                session
+            });
+
+            console.log(`🚀 Game started in room ${session.roomCode}`);
+        });
+
+        // Handle quiz start
+        socket.on('start-quiz', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) {
+                socket.emit('error', { message: 'Only the host can start the quiz' });
+                return;
+            }
+
+            if (session.players.length < 2) {
+                socket.emit('error', { message: 'Need at least 2 players to start quiz' });
+                return;
+            }
+
+            // Initialize quiz state
+            const questions = [
+                {
+                    id: 1,
+                    question: "What is the capital of France?",
+                    options: ["London", "Berlin", "Paris", "Madrid"],
+                    correct: 2
+                },
+                {
+                    id: 2,
+                    question: "Which planet is known as the Red Planet?",
+                    options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                    correct: 1
+                },
+                {
+                    id: 3,
+                    question: "What is 2 + 2?",
+                    options: ["3", "4", "5", "6"],
+                    correct: 1
+                },
+                {
+                    id: 4,
+                    question: "Who painted the Mona Lisa?",
+                    options: ["Van Gogh", "Picasso", "Da Vinci", "Monet"],
+                    correct: 2
+                },
+                {
+                    id: 5,
+                    question: "What is the largest ocean on Earth?",
+                    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                    correct: 3
+                }
+            ];
+
+            session.gameState = 'playing';
+            session.questions = questions;
+            session.currentQuestionIndex = 0;
+            session.currentQuestion = questions[0];
+            session.currentTurn = session.players[0].id;
+            session.scores = {};
+            session.questionNumber = 1;
+            session.showAnswer = false;
+
+            // Initialize scores
+            session.players.forEach(p => {
+                session.scores[p.id] = 0;
+            });
+
+            // Notify all players
+            io.to(roomId).emit('quiz-started', {
+                question: session.currentQuestion,
+                currentTurn: session.currentTurn,
+                questionNumber: session.questionNumber
+            });
+
+            console.log(`🎯 Quiz started in room ${session.roomCode}`);
+        });
+
+        // Handle quiz answer
+        socket.on('answer-question', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session || session.gameState !== 'playing') return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || session.currentTurn !== playerId) return;
+
+            const { selectedAnswer } = data;
+            const question = session.currentQuestion;
+            const isCorrect = selectedAnswer === question.correct;
+
+            // Update score
+            if (isCorrect) {
+                session.scores[playerId] = (session.scores[playerId] || 0) + 1;
+            }
+
+            session.showAnswer = true;
+
+            // Notify all players
+            io.to(roomId).emit('question-answered', {
+                playerId,
+                playerName: player.name,
+                selectedAnswer,
+                correctAnswer: question.correct,
+                answerText: question.options[selectedAnswer],
+                isCorrect,
+                scores: session.scores
+            });
+
+            console.log(`📝 ${player.name} answered question ${session.questionNumber}: ${isCorrect ? 'correct' : 'wrong'}`);
+        });
+
+        // Handle next question
+        socket.on('next-question', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session || session.gameState !== 'playing') return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) return;
+
+            session.currentQuestionIndex++;
+
+            // Check if quiz is finished
+            if (session.currentQuestionIndex >= session.questions.length) {
+                // Find winner
+                let maxScore = -1;
+                let winner = null;
+
+                session.players.forEach(p => {
+                    const score = session.scores[p.id] || 0;
+                    if (score > maxScore) {
+                        maxScore = score;
+                        winner = { name: p.name, score };
+                    }
+                });
+
+                session.gameState = 'finished';
+
+                io.to(roomId).emit('quiz-finished', {
+                    scores: session.scores,
+                    winner
+                });
+
+                console.log(`🏁 Quiz finished in room ${session.roomCode}. Winner: ${winner.name}`);
+                return;
+            }
+
+            // Move to next question and next player
+            session.currentQuestion = session.questions[session.currentQuestionIndex];
+            session.questionNumber = session.currentQuestionIndex + 1;
+            session.showAnswer = false;
+
+            // Next player's turn
+            const currentPlayerIndex = session.players.findIndex(p => p.id === session.currentTurn);
+            const nextPlayerIndex = (currentPlayerIndex + 1) % session.players.length;
+            session.currentTurn = session.players[nextPlayerIndex].id;
+
+            io.to(roomId).emit('next-question', {
+                question: session.currentQuestion,
+                currentTurn: session.currentTurn,
+                currentPlayerName: session.players[nextPlayerIndex].name,
+                questionNumber: session.questionNumber
+            });
+
+            console.log(`➡️ Next question in room ${session.roomCode}: Q${session.questionNumber}`);
+        });
+
+        // Handle quiz reset
+        socket.on('reset-quiz', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) return;
+
+            // Reset quiz state
+            session.gameState = 'waiting';
+            session.currentQuestion = null;
+            session.currentTurn = null;
+            session.scores = {};
+            session.questionNumber = 0;
+            session.showAnswer = false;
+
+            io.to(roomId).emit('session-updated', session);
+
+            console.log(`🔄 Quiz reset in room ${session.roomCode}`);
+        });
+
         // Handle player status updates
         socket.on('update-status', (data) => {
             const connectionInfo = activeConnections.get(socket.id);
@@ -325,28 +618,45 @@ app.prepare().then(() => {
                     const player = session.players.find(p => p.id === playerId);
                     const playerName = player ? player.name : 'Unknown';
 
-                    // Remove player from session
-                    session.players = session.players.filter(p => p.id !== playerId);
-
-                    // If no players left, delete session
-                    if (session.players.length === 0) {
-                        gameSessions.delete(roomId);
-                        console.log(`Room ${session.roomCode} deleted - no players left`);
-                    } else {
-                        // Notify remaining players
-                        socket.to(roomId).emit('player-left', {
-                            playerId,
-                            playerName,
-                            room: {
-                                ...session,
-                                players: session.players
-                            }
-                        });
+                    // Mark player as disconnected instead of removing immediately
+                    if (player) {
+                        player.status = 'disconnected';
+                        player.socketId = null;
                     }
+
+                    // Set a timeout to remove player if they don't reconnect
+                    setTimeout(() => {
+                        const currentSession = gameSessions.get(roomId);
+                        if (currentSession) {
+                            const currentPlayer = currentSession.players.find(p => p.id === playerId);
+
+                            // Only remove if still disconnected (no new socket)
+                            if (currentPlayer && currentPlayer.status === 'disconnected' && !currentPlayer.socketId) {
+                                currentSession.players = currentSession.players.filter(p => p.id !== playerId);
+
+                                // If no players left, delete session
+                                if (currentSession.players.length === 0) {
+                                    gameSessions.delete(roomId);
+                                    console.log(`🗑️ Room ${currentSession.roomCode} deleted - no players left`);
+                                } else {
+                                    // Notify remaining players
+                                    io.to(roomId).emit('player-left', {
+                                        playerId,
+                                        playerName,
+                                        room: {
+                                            ...currentSession,
+                                            players: currentSession.players
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }, 5000); // 5 second grace period for reconnection
+
+                    console.log(`⏸️ Player ${playerId} temporarily disconnected from room ${roomId}`);
                 }
 
                 activeConnections.delete(socket.id);
-                console.log(`Player ${playerId} disconnected from room ${roomId}`);
             }
         });
     });

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { io } from 'socket.io-client';
 import Link from 'next/link';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
@@ -55,31 +56,91 @@ export default function MultiplayerPage() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [playerName, setPlayerName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    // Get stored player name
+    const storedPlayerName = localStorage.getItem('playerName');
+    if (storedPlayerName) {
+      setPlayerName(storedPlayerName);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Create socket connection
+    const socketInstance = io('http://localhost:3000', {
+      transports: ['websocket', 'polling']
+    });
+
+    setSocket(socketInstance);
+
+    // Listen for room creation response
+    socketInstance.on('room-created', (data) => {
+      console.log('🎮 Room created on client:', data);
+      localStorage.setItem('currentRoomCode', data.roomCode);
+      localStorage.setItem('playerId', data.playerId);
+      setCreating(false);
+      router.push(`/room/${data.roomCode}`);
+    });
+
+    socketInstance.on('error', (error) => {
+      console.error('❌ Socket error:', error);
+      alert(error.message);
+      setCreating(false);
+    });
+
+    socketInstance.on('connect', () => {
+      console.log('🔌 Multiplayer page connected:', socketInstance.id);
+    });
+
+    return () => {
+      socketInstance.close();
+    };
+  }, [router]);
 
   const createRoom = async () => {
     if (!selectedMovie || !playerName.trim()) return;
 
+    if (!socket || !socket.connected) {
+      alert('Connection not ready. Please wait and try again.');
+      return;
+    }
+
     setCreating(true);
     
-    try {
-      // Generate unique player ID
-      const playerId = `player_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      // Store player info in localStorage for room page
-      localStorage.setItem('playerInfo', JSON.stringify({
-        id: playerId,
-        name: playerName.trim()
-      }));
-      
-      // For now, create mock room (Socket.io integration in next step)
-      const mockRoomCode = Math.random().toString(36).substr(2, 6).toUpperCase();
-      
-      // Redirect to room
-      router.push(`/room/${mockRoomCode}`);
-    } catch (error) {
-      console.error('Error creating room:', error);
-      setCreating(false);
+    // Generate player ID
+    let playerId = localStorage.getItem('playerId');
+    if (!playerId) {
+      playerId = 'player_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('playerId', playerId);
     }
+
+    // Store player name
+    localStorage.setItem('playerName', playerName.trim());
+
+    console.log('🎮 Creating room with:', {
+      playerName: playerName.trim(),
+      playerId,
+      movieId: selectedMovie.id,
+      mode: 'multiplayer-game'
+    });
+
+    // Create room via socket
+    socket.emit('create-room', {
+      playerName: playerName.trim(),
+      playerId,
+      movieId: selectedMovie.id,
+      mode: 'multiplayer-game'
+    });
+
+    // Add timeout in case server doesn't respond
+    setTimeout(() => {
+      if (creating) {
+        console.log('⏰ Room creation timeout');
+        setCreating(false);
+        alert('Room creation timed out. Please try again.');
+      }
+    }, 10000); // 10 second timeout
   };
 
   return (

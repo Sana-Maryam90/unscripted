@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TurnBasedQuizRoom from '../../components/game/TurnBasedQuizRoom';
 import Button from '../../components/ui/Button';
+import { getMovieByIdClient } from '../../lib/moviesClient';
 
 // Available movies for selection
 const availableMovies = [
@@ -39,9 +40,13 @@ export default function QuizGamePage() {
     const [playerName, setPlayerName] = useState('');
     const [playerId, setPlayerId] = useState('');
     const [selectedMovie, setSelectedMovie] = useState(null);
+    const [selectedCharacter, setSelectedCharacter] = useState(null);
+    const [movieData, setMovieData] = useState(null);
     const [isInRoom, setIsInRoom] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [showJoinForm, setShowJoinForm] = useState(false);
+    const [showCharacterSelection, setShowCharacterSelection] = useState(false);
+    const [loadingMovie, setLoadingMovie] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -60,7 +65,21 @@ export default function QuizGamePage() {
         }
     }, []);
 
-    const createRoom = () => {
+    const loadMovieData = async (movieId) => {
+        setLoadingMovie(true);
+        try {
+            const movie = await getMovieByIdClient(movieId);
+            setMovieData(movie);
+            setShowCharacterSelection(true);
+        } catch (error) {
+            console.error('Error loading movie:', error);
+            alert('Failed to load movie data');
+        } finally {
+            setLoadingMovie(false);
+        }
+    };
+
+    const createRoom = async () => {
         if (!playerName.trim()) {
             alert('Please enter your name');
             return;
@@ -73,10 +92,8 @@ export default function QuizGamePage() {
         setIsCreating(true);
         localStorage.setItem('playerName', playerName);
 
-        // Generate room code (same pattern as test-chat)
-        const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-        setRoomCode(newRoomCode);
-        setIsInRoom(true);
+        // Load movie data and show character selection
+        await loadMovieData(selectedMovie.id);
         setIsCreating(false);
     };
 
@@ -91,6 +108,20 @@ export default function QuizGamePage() {
         }
 
         localStorage.setItem('playerName', playerName);
+        // For joining, character selection will be handled in TurnBasedQuizRoom
+        // if the room has a movie selected
+        setIsInRoom(true);
+    };
+
+    const selectCharacter = (character) => {
+        setSelectedCharacter(character);
+        // Use character name as player name in the quiz room
+        setPlayerName(character.name);
+        localStorage.setItem('playerName', character.name);
+        
+        // Generate room code and enter room
+        const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        setRoomCode(newRoomCode);
         setIsInRoom(true);
     };
 
@@ -98,7 +129,10 @@ export default function QuizGamePage() {
         setIsInRoom(false);
         setRoomCode('');
         setSelectedMovie(null);
+        setSelectedCharacter(null);
+        setMovieData(null);
         setShowJoinForm(false);
+        setShowCharacterSelection(false);
     };
 
     if (isInRoom && roomCode && playerId && playerName) {
@@ -108,8 +142,76 @@ export default function QuizGamePage() {
                 playerId={playerId}
                 playerName={playerName}
                 selectedMovie={selectedMovie}
+                selectedCharacter={selectedCharacter}
+                movieData={movieData}
                 onLeave={leaveRoom}
             />
+        );
+    }
+
+    // Character Selection Screen
+    if (showCharacterSelection && movieData) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+                {/* Animated Background */}
+                <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+                    <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+                    <div className="absolute top-40 left-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+                </div>
+
+                <div className="relative min-h-screen flex items-center justify-center p-4">
+                    <div className="glass-card p-8 w-full max-w-4xl">
+                        <div className="text-center mb-8">
+                            <h1 className="text-4xl font-bold text-white mb-2">
+                                Choose Your Character
+                            </h1>
+                            <p className="text-gray-400 mb-4">
+                                Select a character from <strong>{movieData.title}</strong> to play as in the quiz
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                Your character name will be your username in the quiz room
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            {movieData.characters.map((character) => (
+                                <div
+                                    key={character.id}
+                                    onClick={() => selectCharacter(character)}
+                                    className="p-6 rounded-lg border-2 border-gray-600 bg-white/5 hover:border-indigo-400 hover:bg-indigo-500/10 cursor-pointer transition-all group"
+                                >
+                                    <div className="text-center">
+                                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                                            <span className="text-2xl font-bold text-white">
+                                                {character.name.charAt(0)}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-white font-semibold mb-2 group-hover:text-indigo-300">
+                                            {character.name}
+                                        </h3>
+                                        <p className="text-gray-400 text-sm mb-3 line-clamp-2">
+                                            {character.description}
+                                        </p>
+                                        <div className="text-xs text-gray-500">
+                                            <strong>Personality:</strong> {character.personality}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="text-center">
+                            <Button
+                                onClick={() => setShowCharacterSelection(false)}
+                                variant="secondary"
+                            >
+                                ← Back to Movie Selection
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 
@@ -159,8 +261,8 @@ export default function QuizGamePage() {
                                             key={movie.id}
                                             onClick={() => setSelectedMovie(movie)}
                                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${selectedMovie?.id === movie.id
-                                                    ? 'border-indigo-500 bg-indigo-500/20'
-                                                    : 'border-gray-600 bg-white/5 hover:border-indigo-400'
+                                                ? 'border-indigo-500 bg-indigo-500/20'
+                                                : 'border-gray-600 bg-white/5 hover:border-indigo-400'
                                                 }`}
                                         >
                                             <h3 className="text-white font-semibold mb-2">{movie.title}</h3>

@@ -100,7 +100,7 @@ app.prepare().then(() => {
         // Handle room joining
         socket.on('join-room', (data) => {
             console.log('🚪 Join room request:', data);
-            const { roomCode, playerId, playerName } = data;
+            const { roomCode, playerId, playerName, movieId, characterId } = data;
 
             const roomId = `room_${roomCode}`;
             let session = gameSessions.get(roomId);
@@ -162,10 +162,26 @@ app.prepare().then(() => {
                 name: playerName,
                 socketId: socket.id,
                 isHost: session.players.length === 0, // First player is host
-                characterId: null,
+                characterId: characterId || null,
                 status: 'online',
                 joinedAt: new Date()
             };
+
+            // If this is a quiz room and movieId is provided, set it
+            if (movieId && !session.movieId) {
+                session.movieId = movieId;
+                // Load movie data (in production, this would come from database)
+                try {
+                    const fs = require('fs');
+                    const path = require('path');
+                    const moviePath = path.join(process.cwd(), 'data', 'movies', `${movieId}.json`);
+                    const movieData = JSON.parse(fs.readFileSync(moviePath, 'utf8'));
+                    session.movieData = movieData;
+                    session.availableCharacters = movieData.characters.map(c => c.id);
+                } catch (error) {
+                    console.error('Error loading movie data:', error);
+                }
+            }
 
             session.players.push(newPlayer);
             activeConnections.set(socket.id, { playerId, roomId });
@@ -188,7 +204,9 @@ app.prepare().then(() => {
                 player: newPlayer,
                 room: {
                     ...session,
-                    players: session.players
+                    players: session.players,
+                    movieData: session.movieData,
+                    availableCharacters: session.availableCharacters
                 }
             });
 
@@ -197,18 +215,45 @@ app.prepare().then(() => {
 
         // Handle character selection
         socket.on('select-character', (data) => {
-            const { roomId, playerId, characterId } = data;
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const { characterId, characterName } = data;
             const session = gameSessions.get(roomId);
 
             if (!session) return;
+
+            // Check if character is already taken
+            const characterTaken = session.players.some(p => p.characterId === characterId && p.id !== playerId);
+            if (characterTaken) {
+                socket.emit('error', { message: 'Character already taken' });
+                return;
+            }
 
             // Update player's character
             const player = session.players.find(p => p.id === playerId);
             if (player) {
                 player.characterId = characterId;
+                player.name = characterName; // Use character name as player name
+                
+                // Update available characters list
+                if (session.availableCharacters) {
+                    session.availableCharacters = session.movieData.characters.filter(c => 
+                        !session.players.some(p => p.characterId === c.id)
+                    );
+                }
 
                 // Notify all players
                 io.to(roomId).emit('session-updated', session);
+                io.to(roomId).emit('character-selected', {
+                    playerId,
+                    playerName: characterName,
+                    characterId,
+                    characterName
+                });
+                
+                console.log(`🎭 ${characterName} selected by player in room ${session.roomCode}`);
             }
         });
 
@@ -411,39 +456,111 @@ app.prepare().then(() => {
                 return;
             }
 
-            // Initialize quiz state
-            const questions = [
-                {
-                    id: 1,
-                    question: "What is the capital of France?",
-                    options: ["London", "Berlin", "Paris", "Madrid"],
-                    correct: 2
-                },
-                {
-                    id: 2,
-                    question: "Which planet is known as the Red Planet?",
-                    options: ["Venus", "Mars", "Jupiter", "Saturn"],
-                    correct: 1
-                },
-                {
-                    id: 3,
-                    question: "What is 2 + 2?",
-                    options: ["3", "4", "5", "6"],
-                    correct: 1
-                },
-                {
-                    id: 4,
-                    question: "Who painted the Mona Lisa?",
-                    options: ["Van Gogh", "Picasso", "Da Vinci", "Monet"],
-                    correct: 2
-                },
-                {
-                    id: 5,
-                    question: "What is the largest ocean on Earth?",
-                    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-                    correct: 3
-                }
-            ];
+            // Initialize quiz state with movie-specific questions
+            let questions = [];
+            
+            // Generate movie-specific questions based on movieId
+            if (session.movieId === 'harry-potter-1') {
+                questions = [
+                    {
+                        id: 1,
+                        question: "What is the name of Harry's owl?",
+                        options: ["Hedwig", "Errol", "Pigwidgeon", "Crookshanks"],
+                        correct: 0
+                    },
+                    {
+                        id: 2,
+                        question: "Which house does the Sorting Hat almost put Harry in?",
+                        options: ["Gryffindor", "Slytherin", "Hufflepuff", "Ravenclaw"],
+                        correct: 1
+                    },
+                    {
+                        id: 3,
+                        question: "What is hidden in the third-floor corridor?",
+                        options: ["The Chamber of Secrets", "The Philosopher's Stone", "A Dragon", "The Room of Requirement"],
+                        correct: 1
+                    },
+                    {
+                        id: 4,
+                        question: "Who is the Potions master at Hogwarts?",
+                        options: ["Professor McGonagall", "Professor Flitwick", "Professor Snape", "Professor Sprout"],
+                        correct: 2
+                    },
+                    {
+                        id: 5,
+                        question: "What does Harry see in the Mirror of Erised?",
+                        options: ["His future", "His parents", "Himself as Quidditch captain", "Voldemort"],
+                        correct: 1
+                    }
+                ];
+            } else if (session.movieId === 'star-wars-4') {
+                questions = [
+                    {
+                        id: 1,
+                        question: "What is Luke Skywalker's home planet?",
+                        options: ["Alderaan", "Tatooine", "Coruscant", "Hoth"],
+                        correct: 1
+                    },
+                    {
+                        id: 2,
+                        question: "Who is revealed to be Luke's father?",
+                        options: ["Obi-Wan Kenobi", "Darth Vader", "Emperor Palpatine", "Han Solo"],
+                        correct: 1
+                    },
+                    {
+                        id: 3,
+                        question: "What is the name of Han Solo's ship?",
+                        options: ["X-wing", "TIE Fighter", "Millennium Falcon", "Star Destroyer"],
+                        correct: 2
+                    },
+                    {
+                        id: 4,
+                        question: "What weapon does a Jedi use?",
+                        options: ["Blaster", "Lightsaber", "Force Pike", "Vibroblade"],
+                        correct: 1
+                    },
+                    {
+                        id: 5,
+                        question: "What is the Death Star's weakness?",
+                        options: ["Thermal exhaust port", "Shield generator", "Main reactor", "Command bridge"],
+                        correct: 0
+                    }
+                ];
+            } else {
+                // Default generic questions for other movies
+                questions = [
+                    {
+                        id: 1,
+                        question: "What genre best describes this movie?",
+                        options: ["Action", "Comedy", "Drama", "Fantasy"],
+                        correct: 3
+                    },
+                    {
+                        id: 2,
+                        question: "Who is the main protagonist?",
+                        options: ["The hero", "The villain", "The sidekick", "The mentor"],
+                        correct: 0
+                    },
+                    {
+                        id: 3,
+                        question: "What is the main conflict in the story?",
+                        options: ["Good vs Evil", "Love vs Duty", "Past vs Future", "All of the above"],
+                        correct: 3
+                    },
+                    {
+                        id: 4,
+                        question: "How does the story typically end?",
+                        options: ["Tragedy", "Happy ending", "Cliffhanger", "Open ending"],
+                        correct: 1
+                    },
+                    {
+                        id: 5,
+                        question: "What makes this story memorable?",
+                        options: ["Characters", "Plot", "Themes", "All of the above"],
+                        correct: 3
+                    }
+                ];
+            }
 
             session.gameState = 'playing';
             session.questions = questions;
@@ -463,7 +580,8 @@ app.prepare().then(() => {
             io.to(roomId).emit('quiz-started', {
                 question: session.currentQuestion,
                 currentTurn: session.currentTurn,
-                questionNumber: session.questionNumber
+                questionNumber: session.questionNumber,
+                movieTitle: session.movieData?.title || 'Unknown Movie'
             });
 
             console.log(`🎯 Quiz started in room ${session.roomCode}`);

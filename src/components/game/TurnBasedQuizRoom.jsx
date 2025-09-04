@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import Button from '../ui/Button';
 
-const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLeave }) => {
+const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, selectedCharacter, movieData, onLeave }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [players, setPlayers] = useState([]);
@@ -19,6 +19,9 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
   const [showAnswer, setShowAnswer] = useState(false);
   const [storyContent, setStoryContent] = useState('');
   const [movieTitle, setMovieTitle] = useState(selectedMovie?.title || '');
+  const [availableCharacters, setAvailableCharacters] = useState([]);
+  const [showCharacterSelection, setShowCharacterSelection] = useState(false);
+  const [currentMovieData, setCurrentMovieData] = useState(movieData);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -58,12 +61,19 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
 
     // Join room when socket connects (same pattern as ChatRoom)
     if (roomCode && playerId && playerName) {
-      console.log('🚪 Joining quiz room:', { roomCode, playerId, playerName, movieId: selectedMovie?.id });
+      console.log('🚪 Joining quiz room:', { 
+        roomCode, 
+        playerId, 
+        playerName, 
+        movieId: selectedMovie?.id,
+        characterId: selectedCharacter?.id 
+      });
       socket.emit('join-room', {
         roomCode,
         playerId,
         playerName,
-        movieId: selectedMovie?.id
+        movieId: selectedMovie?.id,
+        characterId: selectedCharacter?.id
       });
     }
 
@@ -72,6 +82,18 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
       console.log('✅ Joined quiz room:', data);
       setPlayers(data.room.players || []);
       setMessages(data.room.messages || []);
+      
+      // Set movie data if joining an existing room
+      if (data.room.movieData && !currentMovieData) {
+        setCurrentMovieData(data.room.movieData);
+        setMovieTitle(data.room.movieData.title);
+      }
+      
+      // Show character selection if no character selected and movie data available
+      if (!selectedCharacter && data.room.movieData) {
+        setShowCharacterSelection(true);
+        setAvailableCharacters(data.room.availableCharacters || data.room.movieData.characters);
+      }
       
       // Initialize game state
       if (data.room.gameState) {
@@ -88,6 +110,11 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
       console.log('🔄 Quiz session updated:', session);
       setPlayers(session.players || []);
       setMessages(session.messages || []);
+      
+      // Update available characters for character selection
+      if (session.availableCharacters) {
+        setAvailableCharacters(session.availableCharacters);
+      }
       
       if (session.gameState) {
         setGameState(session.gameState);
@@ -197,6 +224,17 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
       setMessages(prev => [...prev, systemMessage]);
     });
 
+    socket.on('character-selected', (data) => {
+      console.log('🎭 Character selected:', data);
+      const systemMessage = {
+        id: Date.now().toString(),
+        type: 'system',
+        text: `${data.playerName} selected ${data.characterName}`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, systemMessage]);
+    });
+
     socket.on('error', (error) => {
       console.error('❌ Socket error:', error);
       alert(error.message);
@@ -213,6 +251,7 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
         socket.off('question-answered');
         socket.off('next-question');
         socket.off('quiz-finished');
+        socket.off('character-selected');
         socket.off('error');
       }
     };
@@ -254,6 +293,18 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
     socket.emit('reset-quiz');
   };
 
+  const selectCharacterInRoom = (character) => {
+    if (!socket) return;
+    
+    console.log('🎭 Selecting character:', character.name);
+    socket.emit('select-character', {
+      characterId: character.id,
+      characterName: character.name
+    });
+    
+    setShowCharacterSelection(false);
+  };
+
   const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString([], { 
       hour: '2-digit', 
@@ -273,6 +324,71 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
   const currentPlayer = players.find(p => p.id === playerId);
   const isHost = currentPlayer?.isHost;
   const currentTurnPlayer = players.find(p => p.id === currentTurn);
+
+  // Character Selection Modal
+  if (showCharacterSelection && currentMovieData) {
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div className="glass-card p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-white mb-2">
+              Choose Your Character
+            </h2>
+            <p className="text-gray-400 mb-2">
+              Select a character from <strong>{currentMovieData.title}</strong>
+            </p>
+            <p className="text-sm text-gray-500">
+              Room: <span className="font-mono text-white">{roomCode}</span>
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {currentMovieData.characters.map((character) => {
+              const isTaken = players.some(p => p.characterId === character.id);
+              const takenBy = isTaken ? players.find(p => p.characterId === character.id)?.name : null;
+              
+              return (
+                <div
+                  key={character.id}
+                  onClick={() => !isTaken && selectCharacterInRoom(character)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    isTaken 
+                      ? 'border-red-500/50 bg-red-500/10 cursor-not-allowed opacity-50' 
+                      : 'border-gray-600 bg-white/5 hover:border-indigo-400 hover:bg-indigo-500/10 cursor-pointer'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-lg font-bold text-white">
+                        {character.name.charAt(0)}
+                      </span>
+                    </div>
+                    <h3 className="text-white font-semibold mb-2">
+                      {character.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-2 line-clamp-2">
+                      {character.description}
+                    </p>
+                    {isTaken && (
+                      <div className="text-red-400 text-xs">
+                        Taken by {takenBy}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="text-center">
+            <Button onClick={onLeave} variant="secondary">
+              Leave Room
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-900">
@@ -331,7 +447,7 @@ const TurnBasedQuizRoom = ({ roomCode, playerId, playerName, selectedMovie, onLe
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">
-                      {player.status || 'online'}
+                      {player.characterId ? `Playing as ${player.characterId}` : (player.status || 'online')}
                     </span>
                     {gameState === 'playing' && (
                       <span className="text-xs text-green-400 font-medium">

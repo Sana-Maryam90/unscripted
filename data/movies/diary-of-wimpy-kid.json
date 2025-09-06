@@ -1,0 +1,129 @@
+{
+  "id": "diary-of-wimpy-kid",
+  "title": "Diary of a Wimpy Kid",
+  "description": "Navigate the treacherous waters of middle school with Greg Heffley. Make choices that could change his social status and friendships forever.",
+  "poster": "/images/moviePosters/DiaryOfaWimpyKid.jpg",
+  "genre": ["Comedy", "Family", "Coming-of-Age"],
+  "duration": "94 minutes",
+  "releaseYear": 2010,
+  "characters": [
+    {
+      "id": "greg",
+      "name": "Greg Heffley",
+      "description": "An ambitious middle schooler trying to become popular",
+      "avatar": "/images/characters/greg.jpg",
+      "personality": "self-centered, ambitious, insecure, funny",
+      "background": "Starting middle school and obsessed with becoming popular"
+    },
+    {
+      "id": "rowley",
+      "name": "Rowley Jefferson",
+      "description": "Greg's innocent and loyal best friend",
+      "avatar": "/images/characters/rowley.jpg",
+      "personality": "naive, kind, loyal, easily influenced",
+      "background": "Greg's childhood friend who just wants to have fun"
+    },
+    {
+      "id": "rodrick",
+      "name": "Rodrick Heffley",
+      "description": "Greg's older brother and constant tormentor",
+      "avatar": "/images/characters/rodrick.jpg",
+      "personality": "mischievous, lazy, musical, protective when needed",
+      "background": "High school student in a band who loves pranking Greg"
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "checkpoint-1",
+      "position": 1,
+      "title": "First Day of Middle School",
+      "context": "Greg starts middle school with big plans for popularity",
+      "sceneDescription": "Greg enters middle school determined to become popular, but must navigate the complex social hierarchy.",
+      "characterChoices": {
+        "greg": [
+          {
+            "id": "choice-1a",
+            "text": "Try to sit with the popular kids at lunch",
+            "impact": "social climbing",
+            "consequences": ["potential popularity", "risk of rejection"]
+          },
+          {
+            "id": "choice-1b",
+            "text": "Stick with Rowley and stay loyal",
+            "impact": "friendship loyalty",
+            "consequences": ["strong friendship", "missed opportunities"]
+          },
+          {
+            "id": "choice-1c",
+            "text": "Try to reinvent yourself completely",
+            "impact": "identity change",
+            "consequences": ["new persona", "authenticity issues"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-2",
+      "position": 2,
+      "title": "The Cheese Touch",
+      "context": "The infamous cheese appears on the basketball court",
+      "sceneDescription": "A moldy piece of cheese becomes the center of a school-wide game of avoidance, and Greg must decide how to handle it.",
+      "characterChoices": {
+        "greg": [
+          {
+            "id": "choice-2a",
+            "text": "Use the cheese touch to gain power",
+            "impact": "manipulative strategy",
+            "consequences": ["social control", "fear-based respect"]
+          },
+          {
+            "id": "choice-2b",
+            "text": "Try to get rid of the cheese secretly",
+            "impact": "problem-solving",
+            "consequences": ["heroic action", "risk of discovery"]
+          },
+          {
+            "id": "choice-2c",
+            "text": "Ignore the whole cheese touch game",
+            "impact": "mature dismissal",
+            "consequences": ["above the drama", "social isolation"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-3",
+      "position": 3,
+      "title": "The Safety Patrol Incident",
+      "context": "Greg and Rowley's friendship is tested during a safety patrol incident",
+      "sceneDescription": "A misunderstanding during safety patrol duty threatens to end Greg and Rowley's friendship.",
+      "characterChoices": {
+        "rowley": [
+          {
+            "id": "choice-3a",
+            "text": "Stand up to Greg and demand respect",
+            "impact": "assertive friendship",
+            "consequences": ["character growth", "friendship evolution"]
+          },
+          {
+            "id": "choice-3b",
+            "text": "Forgive Greg and move on",
+            "impact": "unconditional loyalty",
+            "consequences": ["maintained friendship", "enabling behavior"]
+          },
+          {
+            "id": "choice-3c",
+            "text": "Find new friends who appreciate you",
+            "impact": "independence",
+            "consequences": ["new relationships", "Greg's isolation"]
+          }
+        ]
+      }
+    }
+  ],
+  "baseScript": "Greg Heffley is an ambitious kid with an active imagination and big plans to be rich and famous...",
+  "themes": ["friendship", "growing up", "social pressure", "authenticity", "family"],
+  "difficulty": "beginner",
+  "maxPlayers": 3,
+  "estimatedPlayTime": "30-45 minutes"
+}

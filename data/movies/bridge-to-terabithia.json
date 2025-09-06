@@ -1,0 +1,129 @@
+{
+  "id": "bridge-to-terabithia",
+  "title": "Bridge to Terabithia",
+  "description": "Enter the magical kingdom of Terabithia with Jess and Leslie. Your choices will shape their friendship and the fate of their imaginary world.",
+  "poster": "/images/moviePosters/BridgeToTerabithia.jpg",
+  "genre": ["Drama", "Family", "Fantasy"],
+  "duration": "96 minutes",
+  "releaseYear": 2007,
+  "characters": [
+    {
+      "id": "jess",
+      "name": "Jess Aarons",
+      "description": "An artistic boy who dreams of being the fastest runner in school",
+      "avatar": "/images/characters/jess.jpg",
+      "personality": "creative, sensitive, insecure, loyal",
+      "background": "Fifth-grader from a struggling family who loves to draw and run"
+    },
+    {
+      "id": "leslie",
+      "name": "Leslie Burke",
+      "description": "A creative and fearless girl who becomes Jess's best friend",
+      "avatar": "/images/characters/leslie.jpg",
+      "personality": "imaginative, brave, kind, unconventional",
+      "background": "New girl in town with wealthy, intellectual parents"
+    },
+    {
+      "id": "may-belle",
+      "name": "May Belle Aarons",
+      "description": "Jess's younger sister who looks up to him",
+      "avatar": "/images/characters/may-belle.jpg",
+      "personality": "innocent, admiring, brave, loving",
+      "background": "Jess's little sister who wants to be included in everything"
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "checkpoint-1",
+      "position": 1,
+      "title": "Meeting Leslie",
+      "context": "Jess meets the new girl Leslie Burke",
+      "sceneDescription": "Leslie beats Jess in the race he's been training for all summer, and he must decide how to react to this unexpected challenge.",
+      "characterChoices": {
+        "jess": [
+          {
+            "id": "choice-1a",
+            "text": "Be angry and resentful about losing",
+            "impact": "competitive bitterness",
+            "consequences": ["delayed friendship", "missed opportunities"]
+          },
+          {
+            "id": "choice-1b",
+            "text": "Admire Leslie's courage and befriend her",
+            "impact": "open friendship",
+            "consequences": ["immediate bond", "shared adventures"]
+          },
+          {
+            "id": "choice-1c",
+            "text": "Challenge Leslie to prove yourself",
+            "impact": "competitive respect",
+            "consequences": ["rivalry friendship", "mutual challenge"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-2",
+      "position": 2,
+      "title": "Creating Terabithia",
+      "context": "Jess and Leslie discover their secret kingdom",
+      "sceneDescription": "Leslie suggests creating an imaginary kingdom in the woods, and they must decide how to build their magical world.",
+      "characterChoices": {
+        "leslie": [
+          {
+            "id": "choice-2a",
+            "text": "Make Terabithia a place of pure imagination",
+            "impact": "fantasy focus",
+            "consequences": ["magical escapism", "creative bonding"]
+          },
+          {
+            "id": "choice-2b",
+            "text": "Use Terabithia to solve real-world problems",
+            "impact": "practical magic",
+            "consequences": ["problem-solving skills", "real-world application"]
+          },
+          {
+            "id": "choice-2c",
+            "text": "Invite others to join their kingdom",
+            "impact": "inclusive community",
+            "consequences": ["expanded friendship", "shared secrets"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-3",
+      "position": 3,
+      "title": "The Storm",
+      "context": "A dangerous storm threatens their access to Terabithia",
+      "sceneDescription": "Heavy rains have made the creek dangerous, but Leslie wants to visit Terabithia. Jess must make a crucial decision.",
+      "characterChoices": {
+        "jess": [
+          {
+            "id": "choice-3a",
+            "text": "Insist on going to Terabithia together",
+            "impact": "shared risk",
+            "consequences": ["mutual adventure", "shared danger"]
+          },
+          {
+            "id": "choice-3b",
+            "text": "Suggest waiting for better weather",
+            "impact": "cautious wisdom",
+            "consequences": ["safety first", "delayed gratification"]
+          },
+          {
+            "id": "choice-3c",
+            "text": "Go to the museum trip instead",
+            "impact": "alternative choice",
+            "consequences": ["different experience", "missed opportunity"]
+          }
+        ]
+      }
+    }
+  ],
+  "baseScript": "Jess Aarons has been practicing all summer to become the fastest runner in the fifth grade...",
+  "themes": ["friendship", "imagination", "loss", "growing up", "creativity"],
+  "difficulty": "intermediate",
+  "maxPlayers": 3,
+  "estimatedPlayTime": "40-55 minutes"
+}

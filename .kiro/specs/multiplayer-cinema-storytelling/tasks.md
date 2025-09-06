@@ -15,12 +15,18 @@
   - Set up environment variables for OpenAI API and Redis connection
   - _Requirements: 8.1, 8.2_
 
-- [ ] 2. Create movie data structure and management system
-  - Create JSON files for movie data with characters and checkpoints structure
-  - Implement movie loading utilities and validation functions
-  - Create sample movie data (Harry Potter) with characters and story checkpoints
-  - Write unit tests for movie data loading and validation
-  - _Requirements: 8.1, 8.2, 2.1_
+- [x] 2. Improve Quiz-Game
+
+
+
+
+
+  - player selects "play quiz game" on home page and chooses movie to make the room about.
+  - Player should be able to select a character from that movie. 
+  - player should play as that character in the quiz game room and the player username in the quiz game room should be same as that character chosen.
+  - other players get code for the game room and insert to join.
+  - other player should also be able to select a character from that movie (only available)
+  - Each character can be chosen by only one player.
 
 - [ ] 3. Implement core data models and interfaces
   - Define TypeScript interfaces for GameRoom, Player, StoryState, and Movie structures

@@ -151,7 +151,7 @@ export default function JoinPage() {
                 
                 <div className="text-center">
                   <span className="text-gray-400 text-sm">Don't have a code? </span>
-                  <Link href="/multiplayer" className="text-purple-400 hover:text-purple-300 text-sm">
+                  <Link href="/quiz-game" className="text-purple-400 hover:text-purple-300 text-sm">
                     Create a room
                   </Link>
                 </div>

@@ -18,8 +18,8 @@ export default function RoomPage() {
     const currentRoomCode = localStorage.getItem('currentRoomCode');
     
     if (!playerName) {
-      // Redirect to multiplayer page if no player info
-      router.push('/multiplayer');
+      // Redirect to quiz-game page if no player info
+      router.push('/quiz-game');
       return;
     }
 
@@ -45,7 +45,7 @@ export default function RoomPage() {
   }, [roomCode, router]);
 
   const handleLeaveRoom = () => {
-    router.push('/multiplayer');
+    router.push('/quiz-game');
   };
 
   if (isLoading) {

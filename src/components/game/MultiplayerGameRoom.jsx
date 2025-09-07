@@ -207,7 +207,7 @@ const MultiplayerGameRoom = ({ roomCode, playerId, playerName }) => {
   };
 
   const leaveRoom = () => {
-    router.push('/multiplayer');
+    router.push('/quiz-game');
   };
 
   const formatTime = (timestamp) => {

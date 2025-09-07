@@ -51,11 +51,11 @@ export default async function Home() {
   const featuredMovies = await getFeaturedMovies();
   return (
     <div className="min-h-screen relative">
-      {/* Cinematic Background Effects */}
+      {/* Artistic Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-red-600/10 to-amber-500/5 rounded-full filter blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-amber-500/8 to-red-600/5 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-white/3 to-transparent rounded-full filter blur-3xl"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-primary-500/15 to-cream/5 rounded-full filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-cream/8 to-primary-500/10 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-slate-dark/20 to-transparent rounded-full filter blur-3xl"></div>
       </div>
 
       <Header />
@@ -66,36 +66,28 @@ export default async function Home() {
           <Container>
             <div className="text-center">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
-                <span className="modern-text">Rewrite Your Favorite</span>
+                <span className="modern-text">Cinema</span>
                 <span className="block accent-text font-black">
-                  Movie Stories
+                  Reimagined
                 </span>
               </h1>
-              <p className="text-xl sm:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-                Transform passive movie watching into interactive storytelling adventures. 
-                Collaborate with friends to create alternate storylines using AI-powered narrative generation.
+              <p className="text-xl sm:text-2xl text-cream/80 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+                Interactive storytelling meets cinematic adventure. 
+                Play as your favorite characters and reshape movie narratives.
               </p>
               
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
                 <Link href="/quiz-game">
-                  <Button size="xl" className="w-full sm:w-auto">
+                  <Button size="xl" className="w-full sm:w-auto modern-button">
                     <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Play Quiz Game
                   </Button>
                 </Link>
-                <Link href="/multiplayer">
-                  <Button variant="secondary" size="xl" className="w-full sm:w-auto">
-                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    Story Mode
-                  </Button>
-                </Link>
                 <Link href="/single-player">
-                  <Button variant="ghost" size="xl" className="w-full sm:w-auto">
+                  <Button variant="secondary" size="xl" className="w-full sm:w-auto bg-cream text-slate-dark hover:bg-cream/90">
                     <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -106,9 +98,9 @@ export default async function Home() {
 
               {/* Join Game */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <span className="text-gray-400">Already have a room code?</span>
+                <span className="text-cream/60">Already have a room code?</span>
                 <Link href="/join">
-                  <Button variant="ghost" className="text-purple-400 hover:text-white">
+                  <Button variant="ghost" className="text-primary-400 hover:text-cream">
                     Join Game →
                   </Button>
                 </Link>
@@ -121,10 +113,10 @@ export default async function Home() {
         <section id="features" className="py-20">
           <Container>
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-5xl font-bold text-white mb-6">
+              <h2 className="text-3xl sm:text-5xl font-bold text-cream mb-6 font-display">
                 Why Choose Unscripted?
               </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              <p className="text-xl text-cream/70 max-w-3xl mx-auto">
                 Experience cinema like never before with our innovative storytelling platform
               </p>
             </div>
@@ -146,10 +138,10 @@ export default async function Home() {
         <section id="how-it-works" className="py-20">
           <Container>
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-5xl font-bold text-white mb-6">
+              <h2 className="text-3xl sm:text-5xl font-bold text-cream mb-6 font-display">
                 How It Works
               </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              <p className="text-xl text-cream/70 max-w-3xl mx-auto">
                 Get started in just a few simple steps
               </p>
             </div>
@@ -172,12 +164,12 @@ export default async function Home() {
                   description: 'Make choices at key moments and watch AI generate unique storylines based on your decisions.'
                 }
               ].map((step, index) => (
-                <Card key={index} variant="glass" className="p-8 text-center">
-                  <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">{step.step}</span>
+                <Card key={index} variant="glass" className="p-8 text-center glass-card">
+                  <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-primary-500 to-primary-400 rounded-full flex items-center justify-center">
+                    <span className="text-2xl font-bold text-cream">{step.step}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{step.title}</h3>
-                  <p className="text-gray-300">{step.description}</p>
+                  <h3 className="text-xl font-bold text-cream mb-4 font-display">{step.title}</h3>
+                  <p className="text-cream/70">{step.description}</p>
                 </Card>
               ))}
             </div>
@@ -188,10 +180,10 @@ export default async function Home() {
         <section id="movies" className="py-20">
           <Container>
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-5xl font-bold text-white mb-6">
+              <h2 className="text-3xl sm:text-5xl font-bold text-cream mb-6 font-display">
                 Featured Movies
               </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              <p className="text-xl text-cream/70 max-w-3xl mx-auto">
                 Start your storytelling adventure with these popular movies
               </p>
             </div>
@@ -211,21 +203,21 @@ export default async function Home() {
         {/* CTA Section */}
         <section className="py-20">
           <Container>
-            <Card variant="gradient" className="p-12 text-center">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            <Card variant="gradient" className="p-12 text-center glass-card">
+              <h2 className="text-3xl sm:text-4xl font-bold text-cream mb-6 font-display">
                 Ready to Rewrite Cinema History?
               </h2>
-              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-cream/80 mb-8 max-w-2xl mx-auto">
                 Join thousands of storytellers creating unique movie experiences every day.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/multiplayer">
-                  <Button size="lg" className="w-full sm:w-auto">
+                <Link href="/quiz-game">
+                  <Button size="lg" className="w-full sm:w-auto modern-button">
                     Start Playing Now
                   </Button>
                 </Link>
                 <Link href="/join">
-                  <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                  <Button variant="secondary" size="lg" className="w-full sm:w-auto bg-cream text-slate-dark hover:bg-cream/90">
                     Join a Game
                   </Button>
                 </Link>

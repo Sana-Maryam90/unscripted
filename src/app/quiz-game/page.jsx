@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import TurnBasedQuizRoom from '../../components/game/TurnBasedQuizRoom';
 import Button from '../../components/ui/Button';
 import { getMovieByIdClient } from '../../lib/moviesClient';
@@ -35,7 +35,7 @@ const availableMovies = [
     }
 ];
 
-export default function QuizGamePage() {
+function QuizGameContent() {
     const [roomCode, setRoomCode] = useState('');
     const [playerName, setPlayerName] = useState('');
     const [playerId, setPlayerId] = useState('');
@@ -48,6 +48,7 @@ export default function QuizGamePage() {
     const [showCharacterSelection, setShowCharacterSelection] = useState(false);
     const [loadingMovie, setLoadingMovie] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         // Generate or retrieve player ID (same as test-chat)
@@ -63,7 +64,18 @@ export default function QuizGamePage() {
         if (storedPlayerName) {
             setPlayerName(storedPlayerName);
         }
-    }, []);
+
+        // Check if movie is pre-selected via URL parameter
+        const movieId = searchParams.get('movie');
+        if (movieId) {
+            const preSelectedMovie = availableMovies.find(m => m.id === movieId);
+            if (preSelectedMovie) {
+                setSelectedMovie(preSelectedMovie);
+                // Auto-load movie data and show character selection
+                loadMovieData(movieId);
+            }
+        }
+    }, [searchParams]);
 
     const loadMovieData = async (movieId) => {
         setLoadingMovie(true);
@@ -163,13 +175,13 @@ export default function QuizGamePage() {
                 <div className="relative min-h-screen flex items-center justify-center p-4">
                     <div className="glass-card p-8 w-full max-w-4xl">
                         <div className="text-center mb-8">
-                            <h1 className="text-4xl font-bold text-white mb-2">
+                            <h1 className="text-4xl font-bold text-cream mb-2 font-display">
                                 Choose Your Character
                             </h1>
-                            <p className="text-gray-400 mb-4">
+                            <p className="text-cream/70 mb-4">
                                 Select a character from <strong>{movieData.title}</strong> to play as in the quiz
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-cream/50">
                                 Your character name will be your username in the quiz room
                             </p>
                         </div>
@@ -179,21 +191,21 @@ export default function QuizGamePage() {
                                 <div
                                     key={character.id}
                                     onClick={() => selectCharacter(character)}
-                                    className="p-6 rounded-lg border-2 border-gray-600 bg-white/5 hover:border-indigo-400 hover:bg-indigo-500/10 cursor-pointer transition-all group"
+                                    className="p-6 rounded-lg border-2 border-cream/20 bg-cream/5 hover:border-primary-400 hover:bg-primary-500/10 cursor-pointer transition-all group glass-card"
                                 >
                                     <div className="text-center">
-                                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                                            <span className="text-2xl font-bold text-white">
+                                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary-500 to-primary-400 rounded-full flex items-center justify-center">
+                                            <span className="text-2xl font-bold text-cream">
                                                 {character.name.charAt(0)}
                                             </span>
                                         </div>
-                                        <h3 className="text-white font-semibold mb-2 group-hover:text-indigo-300">
+                                        <h3 className="text-cream font-semibold mb-2 group-hover:text-primary-300 font-display">
                                             {character.name}
                                         </h3>
-                                        <p className="text-gray-400 text-sm mb-3 line-clamp-2">
+                                        <p className="text-cream/70 text-sm mb-3 line-clamp-2">
                                             {character.description}
                                         </p>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-cream/50">
                                             <strong>Personality:</strong> {character.personality}
                                         </div>
                                     </div>
@@ -216,21 +228,21 @@ export default function QuizGamePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-            {/* Animated Background */}
+        <div className="min-h-screen bg-gradient-to-br from-slate-darker via-slate-dark to-dark-900">
+            {/* Artistic Background */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-                <div className="absolute top-40 left-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-blob"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cream rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
+                <div className="absolute top-40 left-40 w-80 h-80 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-12 animate-blob animation-delay-4000"></div>
             </div>
 
             <div className="relative min-h-screen flex items-center justify-center p-4">
                 <div className="glass-card p-8 w-full max-w-4xl">
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-white mb-2">
+                        <h1 className="text-4xl font-bold text-cream mb-2 font-display">
                             Turn-Based Movie Quiz
                         </h1>
-                        <p className="text-gray-400">
+                        <p className="text-cream/70">
                             Create or join a room to play a multiplayer movie quiz game
                         </p>
                     </div>
@@ -239,7 +251,7 @@ export default function QuizGamePage() {
                         // Create Room Form
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                <label className="block text-sm font-medium text-cream/80 mb-2">
                                     Your Name
                                 </label>
                                 <input
@@ -247,12 +259,12 @@ export default function QuizGamePage() {
                                     value={playerName}
                                     onChange={(e) => setPlayerName(e.target.value)}
                                     placeholder="Enter your name"
-                                    className="w-full bg-white/10 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
+                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-primary-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-4">
+                                <label className="block text-sm font-medium text-cream/80 mb-4">
                                     Select a Movie
                                 </label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -260,16 +272,16 @@ export default function QuizGamePage() {
                                         <div
                                             key={movie.id}
                                             onClick={() => setSelectedMovie(movie)}
-                                            className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${selectedMovie?.id === movie.id
-                                                ? 'border-indigo-500 bg-indigo-500/20'
-                                                : 'border-gray-600 bg-white/5 hover:border-indigo-400'
+                                            className={`p-4 rounded-lg border-2 cursor-pointer transition-all glass-card ${selectedMovie?.id === movie.id
+                                                ? 'border-primary-500 bg-primary-500/20'
+                                                : 'border-cream/20 bg-cream/5 hover:border-primary-400'
                                                 }`}
                                         >
-                                            <h3 className="text-white font-semibold mb-2">{movie.title}</h3>
-                                            <p className="text-gray-400 text-sm">{movie.description}</p>
+                                            <h3 className="text-cream font-semibold mb-2 font-display">{movie.title}</h3>
+                                            <p className="text-cream/70 text-sm">{movie.description}</p>
                                             {selectedMovie?.id === movie.id && (
                                                 <div className="mt-2">
-                                                    <span className="text-xs bg-indigo-500 text-white px-2 py-1 rounded">
+                                                    <span className="text-xs bg-primary-500 text-cream px-2 py-1 rounded">
                                                         Selected
                                                     </span>
                                                 </div>
@@ -283,14 +295,14 @@ export default function QuizGamePage() {
                                 <Button
                                     onClick={createRoom}
                                     disabled={!playerName.trim() || !selectedMovie || isCreating}
-                                    className="flex-1"
+                                    className="flex-1 modern-button"
                                 >
                                     {isCreating ? 'Creating Room...' : 'Create Quiz Room'}
                                 </Button>
                                 <Button
                                     onClick={() => setShowJoinForm(true)}
                                     variant="secondary"
-                                    className="flex-1"
+                                    className="flex-1 bg-cream text-slate-dark hover:bg-cream/90"
                                 >
                                     Join Existing Room
                                 </Button>
@@ -300,7 +312,7 @@ export default function QuizGamePage() {
                         // Join Room Form
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                <label className="block text-sm font-medium text-cream/80 mb-2">
                                     Your Name
                                 </label>
                                 <input
@@ -308,12 +320,12 @@ export default function QuizGamePage() {
                                     value={playerName}
                                     onChange={(e) => setPlayerName(e.target.value)}
                                     placeholder="Enter your name"
-                                    className="w-full bg-white/10 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
+                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-primary-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                <label className="block text-sm font-medium text-cream/80 mb-2">
                                     Room Code
                                 </label>
                                 <input
@@ -321,7 +333,7 @@ export default function QuizGamePage() {
                                     value={roomCode}
                                     onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                                     placeholder="Enter 6-character room code"
-                                    className="w-full bg-white/10 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 font-mono text-center text-lg tracking-widest"
+                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-primary-500 font-mono text-center text-lg tracking-widest"
                                     maxLength={6}
                                 />
                             </div>
@@ -330,14 +342,14 @@ export default function QuizGamePage() {
                                 <Button
                                     onClick={joinRoom}
                                     disabled={!playerName.trim() || !roomCode.trim()}
-                                    className="flex-1"
+                                    className="flex-1 modern-button"
                                 >
                                     Join Quiz Room
                                 </Button>
                                 <Button
                                     onClick={() => setShowJoinForm(false)}
                                     variant="secondary"
-                                    className="flex-1"
+                                    className="flex-1 bg-cream text-slate-dark hover:bg-cream/90"
                                 >
                                     Back to Create
                                 </Button>
@@ -345,13 +357,13 @@ export default function QuizGamePage() {
                         </div>
                     )}
 
-                    <div className="mt-8 pt-6 border-t border-gray-700 text-center">
-                        <p className="text-xs text-gray-500 mb-2">
+                    <div className="mt-8 pt-6 border-t border-cream/20 text-center">
+                        <p className="text-xs text-cream/50 mb-2">
                             Open multiple browser tabs/windows to test multiplayer functionality
                         </p>
                         <button
                             onClick={() => router.push('/')}
-                            className="text-indigo-400 hover:text-indigo-300 text-sm"
+                            className="text-primary-400 hover:text-primary-300 text-sm"
                         >
                             ← Back to Home
                         </button>
@@ -359,5 +371,13 @@ export default function QuizGamePage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function QuizGamePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <QuizGameContent />
+        </Suspense>
     );
 }

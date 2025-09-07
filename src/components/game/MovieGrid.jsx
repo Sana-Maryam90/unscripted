@@ -6,13 +6,22 @@ import Button from '../ui/Button';
 const MovieGrid = ({ movies, onMovieSelect }) => {
   if (!movies || movies.length === 0) return null;
 
+  const handleMovieClick = (movie) => {
+    if (onMovieSelect) {
+      onMovieSelect(movie);
+    } else {
+      // Default behavior - redirect to quiz-game with movie pre-selected
+      window.location.href = `/quiz-game?movie=${movie.id}`;
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
       {movies.map((movie, index) => (
         <div 
           key={movie.id} 
           className={`group cursor-pointer ${index % 2 === 0 ? 'lg:mt-0' : 'lg:mt-16'}`}
-          onClick={() => onMovieSelect?.(movie)}
+          onClick={() => handleMovieClick(movie)}
         >
           {/* Movie Poster */}
           <div className="relative aspect-[3/4] mb-8 overflow-hidden rounded-lg">

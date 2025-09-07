@@ -13,7 +13,7 @@ const MovieCard = ({
   return (
     <div
       onClick={() => onClick?.(movie)}
-      className={`glass-card p-0 overflow-hidden cursor-pointer group ${selected ? 'ring-2 ring-indigo-500' : ''} ${className}`}
+      className={`glass-card p-0 overflow-hidden cursor-pointer group ${selected ? 'ring-2 ring-primary-500' : ''} ${className}`}
     >
       {/* Movie Poster */}
       <div className="relative aspect-[3/4] overflow-hidden">
@@ -25,8 +25,8 @@ const MovieCard = ({
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-indigo-900/20 to-purple-900/20 flex items-center justify-center">
-            <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-full h-full bg-gradient-to-br from-primary-900/20 to-slate-dark/20 flex items-center justify-center">
+            <svg className="w-16 h-16 text-cream/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V1a1 1 0 011-1h2a1 1 0 011 1v3m0 0h8m-8 0V1" />
             </svg>
           </div>
@@ -43,7 +43,7 @@ const MovieCard = ({
 
         {/* Difficulty badge */}
         <div className="absolute top-3 right-3">
-          <span className="glass-card px-3 py-1 text-xs font-medium text-white">
+          <span className="glass-card px-3 py-1 text-xs font-medium text-cream">
             {difficulty || 'Beginner'}
           </span>
         </div>
@@ -51,10 +51,10 @@ const MovieCard = ({
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="text-xl font-semibold text-white mb-2 modern-text">
+        <h3 className="text-xl font-semibold text-cream mb-2 modern-text font-display">
           {title}
         </h3>
-        <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+        <p className="text-cream/70 text-sm mb-4 line-clamp-2">
           {description}
         </p>
 
@@ -64,7 +64,7 @@ const MovieCard = ({
             {genre.slice(0, 2).map((g, index) => (
               <span 
                 key={index}
-                className="px-3 py-1 glass-card text-xs text-gray-300"
+                className="px-3 py-1 glass-card text-xs text-cream/80"
               >
                 {g}
               </span>
@@ -73,7 +73,7 @@ const MovieCard = ({
         )}
 
         {/* Stats */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-cream/50">
           <div className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -91,22 +91,22 @@ const MovieCard = ({
         {/* Character avatars */}
         {characters && characters.length > 0 && (
           <div className="flex items-center gap-2 mt-4">
-            <span className="text-xs text-gray-500">Characters:</span>
+            <span className="text-xs text-cream/50">Characters:</span>
             <div className="flex -space-x-2">
               {characters.slice(0, 3).map((character) => (
                 <div
                   key={character.id}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 border-2 border-gray-800 flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-400 border-2 border-slate-dark flex items-center justify-center"
                   title={character.name}
                 >
-                  <span className="text-xs text-white font-medium">
+                  <span className="text-xs text-cream font-medium">
                     {character.name.charAt(0)}
                   </span>
                 </div>
               ))}
               {characters.length > 3 && (
-                <div className="w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-800 flex items-center justify-center">
-                  <span className="text-xs text-white">+{characters.length - 3}</span>
+                <div className="w-8 h-8 rounded-full bg-slate-dark border-2 border-slate-darker flex items-center justify-center">
+                  <span className="text-xs text-cream">+{characters.length - 3}</span>
                 </div>
               )}
             </div>

@@ -13,8 +13,8 @@ export default async function MoviesPage() {
   const otherMovies = allMovies.slice(1);
 
   const handleMoviePlay = (movie) => {
-    // Redirect to single player or multiplayer
-    window.location.href = '/single-player';
+    // Redirect to quiz-game with movie pre-selected
+    window.location.href = `/quiz-game?movie=${movie.id}`;
   };
 
   return (
@@ -57,9 +57,9 @@ export default async function MoviesPage() {
                     Start Solo Adventure
                   </Button>
                 </Link>
-                <Link href="/multiplayer">
+                <Link href="/quiz-game">
                   <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                    Create Multiplayer Room
+                    Play Quiz Game
                   </Button>
                 </Link>
               </div>

@@ -57,7 +57,7 @@ const GameComplete = ({ session, currentPlayer }) => {
   };
 
   const createNewRoom = () => {
-    router.push('/multiplayer');
+    router.push('/quiz-game');
   };
 
   const goHome = () => {

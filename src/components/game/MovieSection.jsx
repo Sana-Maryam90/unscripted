@@ -30,8 +30,8 @@ const MovieSection = ({ movies: propMovies, onMovieSelect }) => {
     if (onMovieSelect) {
       onMovieSelect(movie);
     } else {
-      // Default behavior - redirect to multiplayer page
-      router.push('/multiplayer');
+      // Default behavior - redirect to quiz-game with movie pre-selected
+      router.push(`/quiz-game?movie=${movie.id}`);
     }
   };
 

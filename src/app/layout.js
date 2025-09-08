@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Unscripted - Multiplayer Cinema Storytelling",
-  description: "Create alternate movie storylines with friends through AI-powered interactive storytelling",
+  title: "Unscripted - AI-Powered Cinema Storytelling",
+  description: "Transform your favorite movies into interactive storytelling experiences. Create alternate storylines with friends through AI-powered collaborative gameplay.",
 };
 
 export default function RootLayout({ children }) {

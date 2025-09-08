@@ -11,6 +11,7 @@
 ## Code Standards
 
 - **Component Structure**: Functional components with hooks, clear separation of concerns
+- **Code practices**: use of next.js links and images for performance optimization. Use small working components for modularity and reusability. use "use client" in components or pages where appropriate. Coding practices should be relevant to next.js development.
 - **Error Handling**: Comprehensive try-catch blocks, user-friendly error messages
 - **Performance**: Optimize for real-time multiplayer with minimal latency
 - **Security**: Input validation, rate limiting, secure API endpoints

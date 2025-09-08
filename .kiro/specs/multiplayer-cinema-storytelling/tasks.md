@@ -15,12 +15,44 @@
   - Set up environment variables for OpenAI API and Redis connection
   - _Requirements: 8.1, 8.2_
 
-- [ ] 2. Create movie data structure and management system
-  - Create JSON files for movie data with characters and checkpoints structure
-  - Implement movie loading utilities and validation functions
-  - Create sample movie data (Harry Potter) with characters and story checkpoints
-  - Write unit tests for movie data loading and validation
-  - _Requirements: 8.1, 8.2, 2.1_
+- [x] 2. Improve Quiz-Game
+
+
+
+
+
+  - player selects "play quiz game" on home page and chooses movie to make the room about.
+  - Player should be able to select a character from that movie. 
+  - player should play as that character in the quiz game room and the player username in the quiz game room should be same as that character chosen.
+  - other players get code for the game room and insert to join.
+  - other player should also be able to select a character from that movie (only available)
+  - Each character can be chosen by only one player.
+
+
+- [x] 3. Improve website design and UI/UX
+
+
+
+
+
+  - Use this theme for website: #262c34, #1b1f22, #fdf0e9, #495696
+  - Improve landing page. Keep it minimal but artistic and modern.
+  - Use modern artistic fonts
+  - Use external resources and assets where needed for UI/UX.
+  - There should only be 2 play options: quiz game and solo. No story mode.
+  - The quiz game flow should remain same but as for clicking on the movie to play; we should navigate to the character selection page for that movie for playing the quiz game.
+
+- [x] 4. Implement correct navigation
+
+
+
+
+
+  - Movie selection and character selection screens for quiz-game should follow new styles, not the old ones.
+  - When we choose a movie from our collection of movies to play, we are aiming to play the quiz-game and not the old /multiplayer game.
+  - When we select a movie diretly from the movie collection, it should bypass the movie selection page of the quiz and go straight to the character selection page for the movie'es quiz game.
+  - remove the old multiplayer game screens and keep only quiz-game and solo game.
+
 
 - [ ] 3. Implement core data models and interfaces
   - Define TypeScript interfaces for GameRoom, Player, StoryState, and Movie structures

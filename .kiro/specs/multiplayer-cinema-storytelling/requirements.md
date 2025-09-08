@@ -15,7 +15,7 @@ The Multiplayer Cinema Storytelling Game is an AI-powered web platform that allo
 1. WHEN a user selects "Create Room" THEN the system SHALL display a list of available movies to choose from
 2. WHEN a user creates a room THEN the system SHALL generate a unique room code for sharing
 3. WHEN a user enters a valid room code THEN the system SHALL allow them to join the existing game room
-4. IF a room is full THEN the system SHALL display an error message and prevent joining
+4. IF a room is full (maximum 4 players) THEN the system SHALL display an error message and prevent joining
 5. WHEN a user joins a room THEN the system SHALL display the selected movie and available characters
 
 ### Requirement 2

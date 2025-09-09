@@ -120,21 +120,26 @@ function QuizGameContent() {
         }
 
         localStorage.setItem('playerName', playerName);
-        // For joining, character selection will be handled in TurnBasedQuizRoom
-        // if the room has a movie selected
-        setIsInRoom(true);
+        localStorage.setItem('currentRoomCode', roomCode);
+
+        // Redirect to the Phaser lobby room
+        router.push(`/room/${roomCode}`);
     };
 
     const selectCharacter = (character) => {
         setSelectedCharacter(character);
-        // Use character name as player name in the quiz room
+        // Use character name as player name in the Phaser lobby
         setPlayerName(character.name);
         localStorage.setItem('playerName', character.name);
-        
-        // Generate room code and enter room
+        localStorage.setItem('selectedCharacter', JSON.stringify(character));
+        localStorage.setItem('selectedMovie', JSON.stringify(selectedMovie));
+
+        // Generate room code and redirect to Phaser lobby
         const newRoomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-        setRoomCode(newRoomCode);
-        setIsInRoom(true);
+        localStorage.setItem('currentRoomCode', newRoomCode);
+
+        // Redirect to the Phaser lobby room
+        router.push(`/room/${newRoomCode}`);
     };
 
     const leaveRoom = () => {
@@ -147,19 +152,7 @@ function QuizGameContent() {
         setShowCharacterSelection(false);
     };
 
-    if (isInRoom && roomCode && playerId && playerName) {
-        return (
-            <TurnBasedQuizRoom
-                roomCode={roomCode}
-                playerId={playerId}
-                playerName={playerName}
-                selectedMovie={selectedMovie}
-                selectedCharacter={selectedCharacter}
-                movieData={movieData}
-                onLeave={leaveRoom}
-            />
-        );
-    }
+    // Removed quiz room logic - now redirects to Phaser lobby
 
     // Character Selection Screen
     if (showCharacterSelection && movieData) {

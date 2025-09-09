@@ -236,10 +236,10 @@ app.prepare().then(() => {
             if (player) {
                 player.characterId = characterId;
                 player.name = characterName; // Use character name as player name
-                
+
                 // Update available characters list
                 if (session.availableCharacters) {
-                    session.availableCharacters = session.movieData.characters.filter(c => 
+                    session.availableCharacters = session.movieData.characters.filter(c =>
                         !session.players.some(p => p.characterId === c.id)
                     );
                 }
@@ -252,7 +252,7 @@ app.prepare().then(() => {
                     characterId,
                     characterName
                 });
-                
+
                 console.log(`🎭 ${characterName} selected by player in room ${session.roomCode}`);
             }
         });
@@ -458,7 +458,7 @@ app.prepare().then(() => {
 
             // Initialize quiz state with movie-specific questions
             let questions = [];
-            
+
             // Generate movie-specific questions based on movieId
             if (session.movieId === 'harry-potter-1') {
                 questions = [
@@ -722,6 +722,134 @@ app.prepare().then(() => {
                 player.status = data.status;
                 io.to(roomId).emit('session-updated', session);
             }
+        });
+
+        // Handle Phaser game ready state
+        socket.on('player-ready', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (player) {
+                player.isReady = data.isReady;
+
+                // Notify all players
+                io.to(roomId).emit('player-ready-changed', {
+                    playerId,
+                    playerName: player.name,
+                    isReady: data.isReady,
+                    room: session
+                });
+
+                console.log(`🎯 ${player.name} is ${data.isReady ? 'ready' : 'not ready'} in room ${session.roomCode}`);
+            }
+        });
+
+        // Handle Phaser game start
+        socket.on('start-game', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) {
+                socket.emit('error', { message: 'Only the host can start the game' });
+                return;
+            }
+
+            // Check if all players are ready
+            const allReady = session.players.length >= 2 && session.players.every(p => p.isReady);
+            if (!allReady) {
+                socket.emit('error', { message: 'All players must be ready to start the game' });
+                return;
+            }
+
+            // Update game state to lobby (Phaser scene)
+            session.state = 'lobby';
+
+            // Notify all players
+            io.to(roomId).emit('game-started', {
+                session
+            });
+
+            console.log(`🚀 Phaser game started in room ${session.roomCode}`);
+        });
+
+        // Handle player movement in Phaser lobby
+        socket.on('player-movement', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const { x, y, action, direction } = data;
+
+            // Broadcast movement to all other players in the room
+            socket.to(roomId).emit('player-moved', {
+                id: playerId,
+                x,
+                y,
+                action,
+                direction
+            });
+        });
+
+        // Handle player joining lobby (Phaser-specific)
+        socket.on('join-lobby', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player) return;
+
+            const { charId, x, y } = data;
+
+            // Update player's character info
+            player.charId = charId;
+            player.x = x || 400;
+            player.y = y || 300;
+            player.action = 'idle';
+            player.direction = 'down';
+
+            // Notify all other players that this player joined the lobby
+            socket.to(roomId).emit('player-joined-lobby', {
+                id: playerId,
+                charId,
+                x: player.x,
+                y: player.y,
+                action: player.action,
+                direction: player.direction
+            });
+
+            console.log(`🎮 ${player.name} joined Phaser lobby in room ${session.roomCode}`);
+        });
+
+        // Handle player leaving lobby
+        socket.on('leave-lobby', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+
+            // Notify all other players that this player left the lobby
+            socket.to(roomId).emit('player-left-lobby', {
+                id: playerId
+            });
+
+            console.log(`🚪 Player left Phaser lobby in room ${roomId}`);
         });
 
         // Handle disconnection

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiled Map Loading Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .test-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        #phaser-container {
+            border: 2px solid #6366f1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Tiled Map Loading Test</h1>
+    
+    <div class="test-info">
+        <h2>Test Objectives:</h2>
+        <ul>
+            <li>✅ Load lobby.tmj Tiled map file</li>
+            <li>✅ Load lobby.png background image</li>
+            <li>✅ Parse Tiled map layers (Background, Collision)</li>
+            <li>✅ Display background image in scene</li>
+            <li>✅ Create collision bodies from Tiled map objects</li>
+        </ul>
+    </div>
+
+    <div id="phaser-container"></div>
+
+    <div class="status">
+        <h3>Test Status:</h3>
+        <p id="status-text">Initializing test...</p>
+        <button onclick="runManualTest()" style="margin-top: 10px; padding: 8px 16px; background: #6366f1; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Run Manual Test
+        </button>
+    </div>
+
+    <script type="module">
+        import GameManager from '/src/lib/phaser/GameManager.js';
+
+        console.log('🚀 Starting Tiled Map Loading Test...');
+
+        // Test configuration
+        const testConfig = {
+            roomId: 'TILED_TEST',
+            world: 'wizarding',
+            charId: 'test_character',
+            socket: null,
+            parentElement: 'phaser-container'
+        };
+
+        // Initialize game
+        let gameManager;
+        let testResults = null;
+
+        try {
+            gameManager = new GameManager(testConfig);
+            
+            // Wait for game to initialize
+            setTimeout(() => {
+                const lobbyScene = gameManager.getCurrentScene();
+                if (lobbyScene) {
+                    console.log('✅ LobbyScene found, test will run automatically');
+                    document.getElementById('status-text').textContent = 'Game initialized. Test running automatically...';
+                    
+                    // Check for test results
+                    const checkResults = setInterval(() => {
+                        if (window.lobbyTestResults) {
+                            testResults = window.lobbyTestResults;
+                            displayResults(testResults);
+                            clearInterval(checkResults);
+                        }
+                    }, 500);
+                } else {
+                    console.error('❌ LobbyScene not found');
+                    document.getElementById('status-text').textContent = 'Error: LobbyScene not found';
+                }
+            }, 1000);
+
+        } catch (error) {
+            console.error('❌ Failed to initialize game:', error);
+            document.getElementById('status-text').textContent = `Error: ${error.message}`;
+        }
+
+        // Manual test function
+        window.runManualTest = function() {
+            if (gameManager) {
+                const lobbyScene = gameManager.getCurrentScene();
+                if (lobbyScene && lobbyScene.testMapLoadingAndRendering) {
+                    testResults = lobbyScene.testMapLoadingAndRendering();
+                    displayResults(testResults);
+                } else {
+                    document.getElementById('status-text').textContent = 'Error: Cannot access test function';
+                }
+            }
+        };
+
+        function displayResults(results) {
+            const statusEl = document.getElementById('status-text');
+            
+            let statusHTML = '<strong>Test Results:</strong><br>';
+            statusHTML += `Tilemap Loaded: ${results.tilemapLoaded ? '✅' : '❌'}<br>`;
+            statusHTML += `Background Image Loaded: ${results.backgroundImageLoaded ? '✅' : '❌'}<br>`;
+            statusHTML += `Background Displayed: ${results.backgroundDisplayed ? '✅' : '❌'}<br>`;
+            statusHTML += `Collision Bodies Created: ${results.collisionBodiesCreated ? '✅' : '❌'}<br>`;
+            statusHTML += `Map Data Parsed: ${results.mapDataParsed ? '✅' : '❌'}<br>`;
+            statusHTML += `Total Collision Bodies: ${results.totalCollisionBodies}<br>`;
+            
+            if (results.errors.length > 0) {
+                statusHTML += '<br><strong>Errors:</strong><br>';
+                results.errors.forEach(error => {
+                    statusHTML += `• ${error}<br>`;
+                });
+            }
+            
+            statusEl.innerHTML = statusHTML;
+        }
+
+        // Make game manager available globally for debugging
+        window.gameManager = gameManager;
+    </script>
+</body>
+</html>

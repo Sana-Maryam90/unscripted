@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import QuizGameRoom from '../../../components/game/QuizGameRoom';
+import PhaserGameRoom from '../../../components/game/PhaserGameRoom';
 
 export default function RoomPage() {
   const params = useParams();
@@ -16,7 +16,7 @@ export default function RoomPage() {
     // Get player info from localStorage
     const playerName = localStorage.getItem('playerName');
     const currentRoomCode = localStorage.getItem('currentRoomCode');
-    
+
     if (!playerName) {
       // Redirect to quiz-game page if no player info
       router.push('/quiz-game');
@@ -40,7 +40,7 @@ export default function RoomPage() {
       name: playerName,
       roomCode
     });
-    
+
     setIsLoading(false);
   }, [roomCode, router]);
 
@@ -64,7 +64,7 @@ export default function RoomPage() {
   }
 
   return (
-    <QuizGameRoom 
+    <PhaserGameRoom
       roomCode={roomCode}
       playerId={playerInfo.id}
       playerName={playerInfo.name}

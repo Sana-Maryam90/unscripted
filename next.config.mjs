@@ -4,18 +4,18 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['socket.io-client'],
   },
-  
+
   // Image optimization configuration
   images: {
     domains: ['oaidalleapiprodscus.blob.core.windows.net'], // DALL-E image domain
     formats: ['image/webp', 'image/avif'],
   },
-  
+
   // Environment variables
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
-  
+
   // Headers for better security
   async headers() {
     return [
@@ -38,8 +38,8 @@ const nextConfig = {
       },
     ];
   },
-  
-  // Webpack configuration for better bundling
+
+  // Webpack configuration for better bundling and Phaser compatibility
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -48,6 +48,23 @@ const nextConfig = {
         net: false,
         tls: false,
       };
+
+      // Phaser 3 webpack configuration
+      config.resolve.alias = {
+        ...config.resolve.alias,
+      };
+
+      // Handle Phaser's canvas and webgl contexts
+      config.module.rules.push({
+        test: /\.js$/,
+        include: /node_modules\/phaser/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
+        },
+      });
     }
     return config;
   },

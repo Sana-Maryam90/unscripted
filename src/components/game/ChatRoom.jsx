@@ -171,48 +171,66 @@ const ChatRoom = ({ roomCode, playerId, playerName }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900">
+    <div className="flex h-[calc(100vh-5rem)] bg-gradient-to-br from-game-cream to-pink-50">
       {/* Players Sidebar */}
-      <div className="w-64 glass-card m-4 p-4 flex flex-col">
+      <div className="w-64 cartoon-card m-4 p-4 flex flex-col max-h-full">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-white mb-2">
-            Room: {roomCode}
+          <h2 
+            className="text-lg font-semibold text-purple-900 mb-2"
+            style={{ fontFamily: 'Fredoka, sans-serif' }}
+          >
+            🎮 Room: {roomCode}
           </h2>
           <div className="flex items-center gap-2 text-sm">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-gray-400">
-              {isConnected ? 'Connected' : 'Disconnected'}
+            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+            <span 
+              className="text-purple-700 font-medium"
+              style={{ fontFamily: 'Poppins, sans-serif' }}
+            >
+              {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
             </span>
           </div>
         </div>
 
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">
-            Players ({players.length}/4)
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <h3 
+            className="text-sm font-bold text-purple-800 mb-3"
+            style={{ fontFamily: 'Fredoka, sans-serif' }}
+          >
+            👥 Players ({players.length}/4)
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2 overflow-y-auto flex-1">
             {players.map((player) => (
-              <div key={player.id} className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+              <div key={player.id} className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-pink-100 to-purple-100 border-2 border-pink-300 hover:scale-105 transition-transform">
                 <div className="relative">
-                  <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-medium text-white">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-sm font-bold text-white">
                       {player.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-900 ${getStatusColor(player.status)}`}></div>
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${getStatusColor(player.status)} shadow-lg`}></div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-white truncate">
+                  <div className="flex items-center gap-2">
+                    <span 
+                      className="text-sm text-purple-900 truncate font-bold"
+                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                    >
                       {player.name}
                     </span>
                     {player.isHost && (
-                      <span className="text-xs bg-indigo-500 text-white px-1 rounded">
-                        HOST
+                      <span 
+                        className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-1 rounded-full font-bold shadow-sm"
+                        style={{ fontFamily: 'Poppins, sans-serif' }}
+                      >
+                        👑 HOST
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span 
+                    className="text-xs text-purple-600 font-medium"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
                     {player.status || 'online'}
                   </span>
                 </div>
@@ -222,30 +240,39 @@ const ChatRoom = ({ roomCode, playerId, playerName }) => {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-4 pt-4 border-t border-gray-700">
-          <h4 className="text-xs font-medium text-gray-400 mb-2">Quick Actions</h4>
+        <div className="mt-4 pt-4 border-t-2 border-pink-300">
+          <h4 
+            className="text-xs font-bold text-purple-800 mb-3"
+            style={{ fontFamily: 'Fredoka, sans-serif' }}
+          >
+            ⚡ Quick Actions
+          </h4>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => sendAction('waved')}
-              className="p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              className="p-2 text-xs bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 rounded-xl text-white transition-all transform hover:scale-105 font-bold shadow-md"
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               👋 Wave
             </button>
             <button
               onClick={() => sendAction('is ready')}
-              className="p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              className="p-2 text-xs bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 rounded-xl text-white transition-all transform hover:scale-105 font-bold shadow-md"
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               ✅ Ready
             </button>
             <button
               onClick={() => sendAction('is thinking')}
-              className="p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              className="p-2 text-xs bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 rounded-xl text-white transition-all transform hover:scale-105 font-bold shadow-md"
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               🤔 Think
             </button>
             <button
               onClick={() => sendAction('likes this')}
-              className="p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              className="p-2 text-xs bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 rounded-xl text-white transition-all transform hover:scale-105 font-bold shadow-md"
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               ❤️ Like
             </button>
@@ -254,74 +281,103 @@ const ChatRoom = ({ roomCode, playerId, playerName }) => {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col m-4 ml-0">
-        <div className="glass-card flex-1 flex flex-col">
-          {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            <div className="space-y-3">
-              {messages.map((message) => (
-                <div key={message.id} className="flex gap-3">
-                  {message.type === 'message' && (
-                    <>
-                      <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-medium text-white">
-                          {message.playerName?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-white">
-                            {message.playerName}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {formatTime(message.timestamp)}
+      <div className="flex-1 flex flex-col m-4 ml-0 max-h-full">
+        <div className="cartoon-card flex-1 flex flex-col overflow-hidden">
+          {/* Chat Header */}
+          <div className="p-4 border-b-2 border-pink-300">
+            <h3 
+              className="text-xl font-bold text-purple-900"
+              style={{ fontFamily: 'Fredoka, sans-serif' }}
+            >
+              💬 Chat Room
+            </h3>
+          </div>
+
+          {/* Messages Container - Fixed Height with Scroll */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <div className="flex-1 p-4 overflow-y-auto scroll-smooth" style={{ maxHeight: 'calc(100vh - 20rem)' }}>
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div key={message.id} className="flex gap-3 animate-slide-up">
+                    {message.type === 'message' && (
+                      <>
+                        <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md border-2 border-white">
+                          <span className="text-sm font-bold text-white">
+                            {message.playerName?.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <p className="text-gray-200 text-sm">
-                          {message.text}
-                        </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span 
+                              className="text-sm font-bold text-purple-900"
+                              style={{ fontFamily: 'Fredoka, sans-serif' }}
+                            >
+                              {message.playerName}
+                            </span>
+                            <span 
+                              className="text-xs text-purple-600"
+                              style={{ fontFamily: 'Poppins, sans-serif' }}
+                            >
+                              {formatTime(message.timestamp)}
+                            </span>
+                          </div>
+                          <p 
+                            className="text-purple-800 text-sm leading-relaxed"
+                            style={{ fontFamily: 'Poppins, sans-serif' }}
+                          >
+                            {message.text}
+                          </p>
+                        </div>
+                      </>
+                    )}
+                    
+                    {message.type === 'system' && (
+                      <div className="flex-1 text-center">
+                        <span 
+                          className="text-sm text-blue-700 font-medium inline-block"
+                          style={{ fontFamily: 'Poppins, sans-serif' }}
+                        >
+                          ℹ️ {message.text}
+                        </span>
                       </div>
-                    </>
-                  )}
-                  
-                  {message.type === 'system' && (
-                    <div className="flex-1 text-center">
-                      <span className="text-xs text-gray-400 bg-gray-800 px-3 py-1 rounded-full">
-                        {message.text}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {message.type === 'action' && (
-                    <div className="flex-1 text-center">
-                      <span className="text-xs text-indigo-400 bg-indigo-900/30 px-3 py-1 rounded-full">
-                        {message.text}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
+                    )}
+                    
+                    {message.type === 'action' && (
+                      <div className="flex-1 text-center">
+                        <span 
+                          className="text-sm text-purple-700 font-medium inline-block"
+                          style={{ fontFamily: 'Poppins, sans-serif' }}
+                        >
+                          ⭐ {message.text}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
           </div>
 
-          {/* Message Input */}
-          <div className="p-4 border-t border-gray-700">
-            <form onSubmit={sendMessage} className="flex gap-2">
+          {/* Message Input - Fixed at Bottom */}
+          <div className="p-4 border-t-2 border-pink-300 bg-white/50">
+            <form onSubmit={sendMessage} className="flex gap-3">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 bg-white/10 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
+                placeholder="Type your message... 💭"
+                className="flex-1 bg-white/90 border-3 border-purple-300 rounded-2xl px-4 py-3 text-purple-900 placeholder-purple-500 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 font-medium shadow-sm"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
                 disabled={!isConnected}
               />
               <button
                 type="submit"
                 disabled={!newMessage.trim() || !isConnected}
-                className="modern-button px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-game-pink hover:bg-game-purple text-white font-bold px-6 py-3 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg border-2 border-white"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
               >
-                Send
+                🚀 SEND
               </button>
             </form>
           </div>

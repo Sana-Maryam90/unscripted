@@ -7,23 +7,29 @@ const FeatureCard = ({
   className = '' 
 }) => {
   return (
-    <Card variant="glass" className={`p-8 text-center glass-card ${className}`}>
-      {/* Icon */}
-      <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-primary-500 to-primary-400 rounded-2xl flex items-center justify-center">
+    <Card variant="gaming" className={`p-8 text-center group hover:scale-105 transition-all duration-300 ${className}`}>
+      {/* Icon - Gaming Style */}
+      <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-pink-400 to-purple-500 rounded-3xl flex items-center justify-center shadow-lg border-3 border-white group-hover:rotate-12 transition-all duration-300">
         {typeof icon === 'string' ? (
-          <div className="text-2xl">{icon}</div>
+          <div className="text-3xl">{icon}</div>
         ) : (
-          <div className="w-8 h-8 text-cream">
+          <div className="w-10 h-10 text-white">
             {icon}
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <h3 className="text-xl font-bold text-cream mb-4 font-display">
+      {/* Content - Cartoonish Styling */}
+      <h3 
+        className="text-xl font-bold text-purple-900 mb-4 group-hover:text-purple-700 transition-colors"
+        style={{ fontFamily: 'Fredoka, sans-serif' }}
+      >
         {title}
       </h3>
-      <p className="text-cream/70 leading-relaxed">
+      <p 
+        className="text-purple-700 leading-relaxed"
+        style={{ fontFamily: 'Poppins, sans-serif' }}
+      >
         {description}
       </p>
     </Card>

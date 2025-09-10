@@ -13,7 +13,7 @@ const MovieCard = ({
   return (
     <div
       onClick={() => onClick?.(movie)}
-      className={`cartoon-card p-0 overflow-hidden cursor-pointer group transition-transform duration-200 hover:scale-105 ${selected ? 'ring-4 ring-pink-400' : ''} ${className}`}
+      className={`bg-cream/95 border-2 border-purple shadow-lg rounded-xl p-0 overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-200 ${selected ? 'ring-2 ring-pink' : ''} ${className}`}
     >
       {/* Movie Poster */}
       <div className="relative aspect-[3/4] overflow-hidden">
@@ -22,34 +22,28 @@ const MovieCard = ({
             src={poster}
             alt={title}
             fill
-            className="object-cover"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 flex items-center justify-center">
-            <svg className="w-16 h-16 text-purple-600/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-full h-full bg-gradient-to-br from-primary-900/20 to-slate-dark/20 flex items-center justify-center">
+            <svg className="w-16 h-16 text-cream/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V1a1 1 0 011-1h2a1 1 0 011 1v3m0 0h8m-8 0V1" />
             </svg>
           </div>
         )}
         
-        {/* Gaming overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-game-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Modern overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-4 left-4 right-4">
-            <button 
-              className="w-full py-2 text-sm font-bold bg-game-pink hover:bg-game-purple text-white rounded-xl border-2 border-white transition-colors"
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              🎮 PLAY NOW
+            <button className="bg-pink text-dark hover:bg-purple hover:text-cream w-full py-2 text-sm font-semibold rounded-lg transition-colors duration-200">
+              Play Now
             </button>
           </div>
         </div>
 
         {/* Difficulty badge */}
         <div className="absolute top-3 right-3">
-          <span 
-            className="bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-game-dark rounded-full border-2 border-game-blue"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
-          >
+          <span className="bg-purple/90 text-cream px-3 py-1 text-xs font-medium rounded-lg">
             {difficulty || 'Beginner'}
           </span>
         </div>
@@ -57,18 +51,9 @@ const MovieCard = ({
 
       {/* Content */}
       <div className="p-6">
-        <h3 
-          className="text-xl font-bold text-purple-900 mb-2"
-          style={{ fontFamily: 'Fredoka, sans-serif' }}
-        >
+        <h3 className="text-xl font-semibold text-dark mb-4 font-display">
           {title}
         </h3>
-        <p 
-          className="text-purple-700 text-sm mb-4 line-clamp-2"
-          style={{ fontFamily: 'Poppins, sans-serif' }}
-        >
-          {description}
-        </p>
 
         {/* Genre tags */}
         {genre && genre.length > 0 && (
@@ -76,8 +61,7 @@ const MovieCard = ({
             {genre.slice(0, 2).map((g, index) => (
               <span 
                 key={index}
-                className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full border-2 border-blue-200"
-                style={{ fontFamily: 'Poppins, sans-serif' }}
+                className="px-3 py-1 bg-blue/30 text-dark text-xs rounded-lg"
               >
                 {g}
               </span>
@@ -86,10 +70,7 @@ const MovieCard = ({
         )}
 
         {/* Stats */}
-        <div 
-          className="flex items-center justify-between text-xs text-purple-600 font-medium"
-          style={{ fontFamily: 'Poppins, sans-serif' }}
-        >
+        <div className="flex items-center justify-between text-xs text-purple">
           <div className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -107,37 +88,22 @@ const MovieCard = ({
         {/* Character avatars */}
         {characters && characters.length > 0 && (
           <div className="flex items-center gap-2 mt-4">
-            <span 
-              className="text-xs text-purple-600 font-medium"
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              Characters:
-            </span>
+            <span className="text-xs text-purple">Characters:</span>
             <div className="flex -space-x-2">
               {characters.slice(0, 3).map((character) => (
                 <div
                   key={character.id}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 border-2 border-white flex items-center justify-center shadow-sm"
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-pink to-purple border-2 border-dark flex items-center justify-center"
                   title={character.name}
                 >
-                  <span 
-                    className="text-xs text-white font-bold"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
+                  <span className="text-xs text-cream font-medium">
                     {character.name.charAt(0)}
                   </span>
                 </div>
               ))}
               {characters.length > 3 && (
-                <div 
-                  className="w-8 h-8 rounded-full bg-purple-600 border-2 border-white flex items-center justify-center shadow-sm"
-                >
-                  <span 
-                    className="text-xs text-white font-bold"
-                    style={{ fontFamily: 'Poppins, sans-serif' }}
-                  >
-                    +{characters.length - 3}
-                  </span>
+                <div className="w-8 h-8 rounded-full bg-dark border-2 border-purple flex items-center justify-center">
+                  <span className="text-xs text-cream">+{characters.length - 3}</span>
                 </div>
               )}
             </div>

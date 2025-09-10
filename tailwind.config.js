@@ -8,38 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Gaming theme color palette
+        // Your exact color palette (primary colors)
+        'cream': '#fef5ef',      // Primary background
+        'pink': '#f5adc4',       // Primary accent
+        'purple': '#884ea5',     // Secondary accent  
+        'blue': '#addee5',       // Tertiary accent
+        'dark': '#521962',       // Dark text/accents
+        
+        // System colors
         background: 'var(--background)',
         foreground: 'var(--foreground)',
-        'game-cream': '#fef5ef',
-        'game-pink': '#f5adc4',
-        'game-purple': '#884ea5',
-        'game-blue': '#addee5',
-        'game-dark': '#521962',
-        primary: {
-          50: '#f0f2ff',
-          100: '#e6e9ff',
-          200: '#d1d7ff',
-          300: '#b3bdff',
-          400: '#8f9aff',
-          500: '#495696',
-          600: '#3d4a82',
-          700: '#333e6e',
-          800: '#2a335a',
-          900: '#242b4a',
-        },
-        secondary: {
-          50: '#fefefe',
-          100: '#fdf0e9',
-          200: '#fbe5d3',
-          300: '#f8d5b8',
-          400: '#f4c19d',
-          500: '#f0ad82',
-          600: '#e89967',
-          700: '#d4844c',
-          800: '#b86f31',
-          900: '#9c5a16',
-        },
+        
         // Enhanced purple shades for the gaming theme
         purple: {
           50: '#faf5ff',
@@ -47,12 +26,11 @@ module.exports = {
           200: '#e9d5ff',
           300: '#d8b4fe',
           400: '#c084fc',
-          500: '#a855f7',
-          600: '#9333ea',
-          700: '#7c3aed',
-          800: '#6b21a8',
-          900: '#521962',
-          950: '#2e1065',
+          500: '#884ea5',  // Your purple
+          600: '#7c3aed',
+          700: '#6b21a8',
+          800: '#521962',  // Your dark
+          900: '#2e1065',
         },
         // Enhanced pink shades
         pink: {
@@ -60,36 +38,39 @@ module.exports = {
           100: '#fce7f3',
           200: '#fbcfe8',
           300: '#f9a8d4',
-          400: '#f5adc4',
+          400: '#f5adc4',  // Your pink
           500: '#ec4899',
           600: '#db2777',
           700: '#be185d',
           800: '#9d174d',
           900: '#831843',
-          950: '#500724',
         },
         // Enhanced blue shades  
         blue: {
           50: '#eff6ff',
           100: '#dbeafe',
           200: '#bfdbfe',
-          300: '#addee5',
+          300: '#addee5',  // Your blue
           400: '#60a5fa',
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
           800: '#1e40af',
           900: '#1e3a8a',
-          950: '#172554',
         },
-        dark: {
-          50: '#f7f8f9',
-          100: '#eef0f2',
-          200: '#d9dde2',
-          300: '#b8c0c8',
-          400: '#929da8',
-          500: '#74808c',
-        cream: '#fdf0e9',
+        // Neutral shades based on your cream
+        neutral: {
+          50: '#fef5ef',   // Your cream
+          100: '#f8ede3',
+          200: '#f0dcc8',
+          300: '#e8caa4',
+          400: '#deb37e',
+          500: '#c8955a',
+          600: '#a67c48',
+          700: '#846139',
+          800: '#614530',
+          900: '#3d2c20',
+        },
         slate: {
           dark: '#262c34',
           darker: '#1b1f22',

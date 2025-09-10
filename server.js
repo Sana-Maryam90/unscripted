@@ -782,52 +782,59 @@ app.prepare().then(() => {
             console.log(`🚀 Phaser game started in room ${session.roomCode}`);
         });
 
-        // Handle player movement in Phaser lobby
-        socket.on('player-movement', (data) => {
-            const connectionInfo = activeConnections.get(socket.id);
-            if (!connectionInfo) return;
-
-            const { playerId, roomId } = connectionInfo;
-            const session = gameSessions.get(roomId);
-            if (!session) return;
-
-            const { x, y, action, direction } = data;
-
-            // Broadcast movement to all other players in the room
-            socket.to(roomId).emit('player-moved', {
-                id: playerId,
-                x,
-                y,
-                action,
-                direction
-            });
-        });
-
-        // Handle player joining lobby (Phaser-specific)
+        // Handle player joining Phaser lobby
         socket.on('join-lobby', (data) => {
+            console.log('🎮 join-lobby received from', socket.id, 'with data:', data);
+
             const connectionInfo = activeConnections.get(socket.id);
-            if (!connectionInfo) return;
+            if (!connectionInfo) {
+                console.log('❌ No connection info for socket:', socket.id);
+                return;
+            }
 
-            const { playerId, roomId } = connectionInfo;
+            const { roomId } = connectionInfo; // ignore playerId, use socket.id
             const session = gameSessions.get(roomId);
-            if (!session) return;
+            if (!session) {
+                console.log('❌ No session found for room:', roomId);
+                return;
+            }
 
-            const player = session.players.find(p => p.id === playerId);
-            if (!player) return;
+            // Find player by socketId instead of playerId
+            let player = session.players.find(p => p.socketId === socket.id);
+            if (!player) {
+                console.log('❌ No player found with socketId:', socket.id);
+                return;
+            }
 
             const { charId, x, y } = data;
 
-            // Update player's character info
+            // Update player's lobby state
             player.charId = charId;
             player.x = x || 400;
             player.y = y || 300;
             player.action = 'idle';
             player.direction = 'down';
 
-            // Notify all other players that this player joined the lobby
-            socket.to(roomId).emit('player-joined-lobby', {
-                id: playerId,
-                charId,
+            console.log('📸 Sending room snapshot to', player.name, 'with', session.players.length, 'players');
+
+            // Send snapshot of ALL players to the newcomer (use socketId for Phaser IDs)
+            socket.emit('room-snapshot', {
+                players: session.players.map(p => ({
+                    id: p.socketId, // use socketId for Phaser IDs
+                    charId: p.charId,
+                    x: p.x,
+                    y: p.y,
+                    action: p.action,
+                    direction: p.direction
+                }))
+            });
+
+            console.log('✨ Broadcasting player-spawn for', player.name, 'to room', roomId);
+
+            // Tell other players about the newcomer
+            socket.to(roomId).emit('player-spawn', {
+                id: socket.id, // use socket.id for Phaser IDs
+                charId: player.charId,
                 x: player.x,
                 y: player.y,
                 action: player.action,
@@ -837,25 +844,58 @@ app.prepare().then(() => {
             console.log(`🎮 ${player.name} joined Phaser lobby in room ${session.roomCode}`);
         });
 
-        // Handle player leaving lobby
-        socket.on('leave-lobby', (data) => {
+        // Handle player movement
+        socket.on('player-movement', (data) => {
             const connectionInfo = activeConnections.get(socket.id);
             if (!connectionInfo) return;
 
-            const { playerId, roomId } = connectionInfo;
+            const { roomId } = connectionInfo; // ignore playerId, use socket.id
+            const session = gameSessions.get(roomId);
+            if (!session) return;
 
-            // Notify all other players that this player left the lobby
-            socket.to(roomId).emit('player-left-lobby', {
-                id: playerId
+            // Find player by socketId instead of playerId
+            const player = session.players.find(p => p.socketId === socket.id);
+            if (!player) return;
+
+            // Update server state
+            player.x = data.x;
+            player.y = data.y;
+            player.action = data.action;
+            player.direction = data.direction;
+
+            // Broadcast to others (use socket.id for Phaser IDs)
+            socket.to(roomId).emit('player-movement', {
+                id: socket.id, // use socket.id instead of playerId
+                x: player.x,
+                y: player.y,
+                action: player.action,
+                direction: player.direction
             });
+        });
+
+        // Handle player leaving Phaser lobby
+        socket.on('leave-lobby', () => {
+            const info = activeConnections.get(socket.id);
+            if (!info) return;
+            const { roomId } = info;
+
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            // Remove by socketId because Phaser uses socket.id as the runtime ID
+            session.players = session.players.filter(p => p.socketId !== socket.id);
+
+            // Tell Phaser clients to remove the rectangle by Phaser ID (socket.id)
+            socket.to(roomId).emit('player-left', { playerId: socket.id });
 
             console.log(`🚪 Player left Phaser lobby in room ${roomId}`);
         });
 
+
+
         // Handle disconnection
         socket.on('disconnect', () => {
             const connectionInfo = activeConnections.get(socket.id);
-
             if (connectionInfo) {
                 const { playerId, roomId } = connectionInfo;
                 const session = gameSessions.get(roomId);
@@ -867,6 +907,8 @@ app.prepare().then(() => {
                     // Mark player as disconnected instead of removing immediately
                     if (player) {
                         player.status = 'disconnected';
+                        // Notify Phaser clients right away so rectangles disappear
+                        io.to(roomId).emit('player-left', { playerId: socket.id });
                         player.socketId = null;
                     }
 

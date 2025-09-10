@@ -17,6 +17,7 @@ class LobbyScene extends Phaser.Scene {
         this.localPlayer = null;
         this.cursors = null;
         this.wasdKeys = null;
+        this.joinedLobby = false;
 
         // Tiled map objects
         this.tiledMap = null;
@@ -32,6 +33,45 @@ class LobbyScene extends Phaser.Scene {
         this.world = this.registry.get('world');
         this.charId = this.registry.get('charId');
         this.socket = this.registry.get('socket');
+
+        // Initialize unique player ID system
+        this.playerId = null;
+        this.joinedLobby = false;
+
+        const emitJoinLobby = () => {
+            if (!this.socket || this.joinedLobby) return;
+            // Ensure we know our socket id
+            this.playerId = this.socket.id || this.playerId;
+            const x = this.localPlayer?.x ?? 500;
+            const y = this.localPlayer?.y ?? 500;
+
+            this.socket.emit('join-lobby', { charId: this.charId, x, y });
+            this.joinedLobby = true;
+            console.log('📡 Sent join-lobby (reliable), with ID:', this.playerId, { x, y });
+        };
+
+        // If already connected (common when Phaser starts after room join), set id now
+        if (this.socket?.connected) {
+            this.playerId = this.socket.id;
+            console.log('🆔 Player ID set immediately:', this.playerId);
+        } else {
+            // Fallback when the socket connects later
+            this.socket?.once('connect', () => {
+                this.playerId = this.socket.id;
+                console.log('🆔 Player ID set on connect:', this.playerId);
+            });
+        }
+
+        // Try to join the lobby as soon as we can
+        // 1) If connected already, emit immediately after scene creates local player (see create())
+        // 2) Also arm extra triggers as safety nets:
+        this.socket?.once('room-joined', emitJoinLobby);
+        this.socket?.once('connect', emitJoinLobby);
+
+        // Tiny fallback in case events came before listeners were attached during hot reload
+        setTimeout(() => {
+            if (!this.joinedLobby && this.socket?.connected) emitJoinLobby();
+        }, 300);
 
         // Initialize AssetLoader
         this.assetLoader = new AssetLoader(this);
@@ -104,6 +144,15 @@ class LobbyScene extends Phaser.Scene {
             // Create local player (placeholder for now)
             this.createLocalPlayer();
 
+            // If we're already connected, emit join-lobby now (otherwise the other triggers will handle it)
+            if (this.socket?.connected && !this.joinedLobby) {
+                const x = this.localPlayer?.x ?? 500;
+                const y = this.localPlayer?.y ?? 500;
+                this.socket.emit('join-lobby', { charId: this.charId, x, y });
+                this.joinedLobby = true;
+                console.log('📡 Sent join-lobby from create() with ID:', this.playerId, { x, y });
+            }
+
             console.log('🎮 LobbyScene created successfully with Tiled map');
         } catch (error) {
             console.error('❌ Failed to create LobbyScene, using minimal fallback:', error);
@@ -115,6 +164,15 @@ class LobbyScene extends Phaser.Scene {
             this.setupInputControls();
             this.setupSocketListeners();
             this.createLocalPlayer();
+
+            // If we're already connected, emit join-lobby now (otherwise the other triggers will handle it)
+            if (this.socket?.connected && !this.joinedLobby) {
+                const x = this.localPlayer?.x ?? 500;
+                const y = this.localPlayer?.y ?? 500;
+                this.socket.emit('join-lobby', { charId: this.charId, x, y });
+                this.joinedLobby = true;
+                console.log('📡 Sent join-lobby from create() with ID:', this.playerId, { x, y });
+            }
 
             console.log('🎮 LobbyScene created with fallback mode');
         }
@@ -496,28 +554,46 @@ class LobbyScene extends Phaser.Scene {
             return;
         }
 
-        // Listen for multiplayer events from the existing Next.js room system
-        this.socket.on('player-joined', (playerData) => {
-            console.log('👤 Player joined lobby:', playerData.player.name);
-            this.addRemotePlayer({
-                id: playerData.player.id,
-                name: playerData.player.name,
-                charId: playerData.player.charId || this.charId,
-                x: 400,
-                y: 300,
-                action: 'idle',
-                direction: 'down'
-            });
+        // Initial snapshot when we join
+        this.socket.on('room-snapshot', (snapshot) => {
+            console.log('📸 Received snapshot:', snapshot);
+            console.log('🆔 My playerId:', this.playerId, 'Socket ID:', this.socket?.id);
+            (snapshot.players || [])
+                .filter(p => {
+                    const isMe = p.id === this.playerId || p.id === this.socket?.id;
+                    console.log('🔍 Player', p.id, 'isMe:', isMe);
+                    return !isMe;
+                })
+                .forEach(p => this.addRemotePlayer(p));
         });
 
-        this.socket.on('player-left', (playerData) => {
-            console.log('👋 Player left lobby:', playerData.playerName);
-            this.removeRemotePlayer(playerData.playerId);
+        // New player arrived
+        this.socket.on('player-spawn', (p) => {
+            console.log('✨ Player spawned:', p);
+            console.log('🆔 My playerId:', this.playerId, 'Socket ID:', this.socket?.id);
+            const isMe = p.id === this.playerId || p.id === this.socket?.id;
+            console.log('🔍 Spawn player', p.id, 'isMe:', isMe);
+            if (!isMe) this.addRemotePlayer(p);
         });
 
-        // Listen for movement updates (will be implemented in future tasks)
-        this.socket.on('player-movement', (moveData) => {
-            this.updateRemotePlayer(moveData);
+        // Player left
+        this.socket.on('player-left', ({ playerId }) => this.removeRemotePlayer(playerId));
+
+        // Movement updates
+        this.socket.on('player-movement', (move) => {
+            if (move.id === this.playerId) return;
+            let rp = this.players.get(move.id);
+            if (!rp) {
+                this.addRemotePlayer(move);
+                rp = this.players.get(move.id);
+            }
+            if (rp) {
+                // Smooth interpolation
+                rp.x = Phaser.Math.Linear(rp.x, move.x, 0.6);
+                rp.y = Phaser.Math.Linear(rp.y, move.y, 0.6);
+                rp.action = move.action;
+                rp.direction = move.direction;
+            }
         });
 
         // Listen for game state changes
@@ -526,155 +602,153 @@ class LobbyScene extends Phaser.Scene {
             // Future task: transition to narration scene
         });
 
-        // Listen for session updates to sync player list
-        this.socket.on('session-updated', (session) => {
-            console.log('🔄 Session updated in lobby scene');
-            this.syncPlayersFromSession(session);
+        // Clean up listeners when scene shuts down
+        this.events.on('shutdown', () => {
+            this.socket.off('room-snapshot');
+            this.socket.off('player-spawn');
+            this.socket.off('player-left');
+            this.socket.off('player-movement');
+            this.socket?.off('room-joined');
+            this.socket?.off('connect');
         });
 
-        console.log('🔌 Socket listeners set up for lobby integration with Next.js room system');
+        console.log('🔌 Socket listeners set up for multiplayer rectangles');
     }
 
     createLocalPlayer() {
-        // === Player setup ===
         const startX = 500; // Start in open area
         const startY = 500;
 
-        this.localPlayer = this.physics.add.sprite(startX, startY, 'player');
-        this.localPlayer.setScale(4); // Make the 8x8 pixel sprite bigger
-        this.localPlayer.setSize(32, 32);
-        this.localPlayer.setTint(0x00ff00); // Green color for local player
-        this.localPlayer.setCollideWorldBounds(true);
+        // Create visible green rectangle for local player
+        const rect = this.add.rectangle(startX, startY, 32, 32, 0x00ff00);
+        this.physics.add.existing(rect);                 // dynamic body
+        rect.body.setCollideWorldBounds(true);
 
         // Make player collide with walls
-        if (this.wallsGroup && this.wallsGroup.children.entries.length > 0) {
-            this.physics.add.collider(this.localPlayer, this.wallsGroup);
-            console.log('✅ Player collision with walls enabled');
+        if (this.wallsGroup) {
+            this.physics.add.collider(rect, this.wallsGroup);
+            console.log('✅ Local player collision with walls enabled');
         }
 
         // Camera follows player with smooth movement
-        this.cameras.main.startFollow(this.localPlayer, true, 0.1, 0.1);
-        console.log('📷 Camera set to follow player (zoom already set in createTiledMap)');
+        this.cameras.main.startFollow(rect, true, 0.1, 0.1);
 
-        // Store player data
-        this.localPlayer.playerId = 'local';
+        this.localPlayer = rect;
+        this.playerId = this.playerId || this.socket?.id || null;
+        this.localPlayer.playerId = this.playerId;
         this.localPlayer.charId = this.charId;
-        this.localPlayer.direction = 'down';
         this.localPlayer.action = 'idle';
+        this.localPlayer.direction = 'down';
 
-        console.log('👤 Local player created at:', startX, startY, 'with proper collision detection');
+        // Note: join-lobby is now emitted in the connect handler to ensure proper timing
+
+        console.log('👤 Local player created as green rectangle at:', startX, startY, 'with ID:', this.localPlayer.playerId);
     }
 
     handlePlayerInput() {
-        if (!this.localPlayer) return;
+        if (!this.localPlayer?.body) return;
 
-        const speed = 200; // Movement speed
-        this.localPlayer.setVelocity(0);
+        const speed = 200;
+        const body = this.localPlayer.body;
+        body.setVelocity(0);
 
-        // WASD and Arrow key movement
-        if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
-            this.localPlayer.setVelocityX(-speed);
-        } else if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
-            this.localPlayer.setVelocityX(speed);
-        }
+        if (this.cursors.left.isDown || this.wasdKeys.A.isDown)
+            body.setVelocityX(-speed);
+        else if (this.cursors.right.isDown || this.wasdKeys.D.isDown)
+            body.setVelocityX(speed);
 
-        if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
-            this.localPlayer.setVelocityY(-speed);
-        } else if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
-            this.localPlayer.setVelocityY(speed);
-        }
+        if (this.cursors.up.isDown || this.wasdKeys.W.isDown)
+            body.setVelocityY(-speed);
+        else if (this.cursors.down.isDown || this.wasdKeys.S.isDown)
+            body.setVelocityY(speed);
+
+        this.localPlayer.action = (body.velocity.x || body.velocity.y) ? 'walk' : 'idle';
 
         // Update visual feedback
-        if (this.localPlayer.body.velocity.x !== 0 || this.localPlayer.body.velocity.y !== 0) {
-            this.localPlayer.setTint(0x00ff88); // Lighter green when moving
+        if (this.localPlayer.action === 'walk') {
+            this.localPlayer.setFillStyle(0x00ff88); // Lighter green when moving
         } else {
-            this.localPlayer.setTint(0x00ff00); // Normal green when idle
+            this.localPlayer.setFillStyle(0x00ff00); // Normal green when idle
         }
 
-        // Broadcast movement to other players (throttled)
         this.broadcastMovement();
     }
 
     broadcastMovement() {
-        if (!this.socket || !this.localPlayer) return;
+        if (!this.socket || !this.localPlayer || !this.playerId) return;
 
-        // Throttle movement broadcasts to avoid spam
         const now = Date.now();
-        if (!this.lastBroadcast || now - this.lastBroadcast > 50) { // 20 FPS broadcast rate
+        if (!this.lastBroadcast || now - this.lastBroadcast > 50) { // 20Hz
             this.socket.emit('player-movement', {
                 roomId: this.roomId,
-                playerId: 'local', // Will be replaced with actual player ID
+                id: this.playerId,
                 x: this.localPlayer.x,
                 y: this.localPlayer.y,
                 action: this.localPlayer.action,
                 direction: this.localPlayer.direction
             });
-
             this.lastBroadcast = now;
         }
     }
 
     updateAnimations() {
-        // Placeholder for animation updates
-        // Will be implemented with actual character sprites in future tasks
-
+        // Visual feedback for rectangles
         if (this.localPlayer) {
-            // Change tint based on movement state for visual feedback
+            // Change color based on movement state for visual feedback
             if (this.localPlayer.action === 'walk') {
-                this.localPlayer.setTint(0x00ff88); // Lighter green when moving
+                this.localPlayer.setFillStyle(0x00ff88); // Lighter green when moving
             } else {
-                this.localPlayer.setTint(0x00ff00); // Normal green when idle
+                this.localPlayer.setFillStyle(0x00ff00); // Normal green when idle
             }
         }
     }
 
     addRemotePlayer(playerData) {
-        if (this.players.has(playerData.id)) return;
+        if (this.players.has(playerData.id)) {
+            console.log('⚠️ Player already exists:', playerData.id);
+            return;
+        }
 
-        // Create remote player sprite
-        const remotePlayer = this.physics.add.sprite(playerData.x, playerData.y, null);
-        remotePlayer.setSize(32, 32);
-        remotePlayer.setTint(0xff0000); // Red color for remote players
-        remotePlayer.body.setSize(32, 32);
+        console.log('🔴 Creating red rectangle for remote player:', playerData);
 
-        // Set up collision with Tiled map collision bodies
-        this.collisionBodies.forEach(collisionBody => {
-            this.physics.add.collider(remotePlayer, collisionBody);
-        });
+        // Create visible red rectangle for remote player
+        const rect = this.add.rectangle(playerData.x, playerData.y, 32, 32, 0xff4444);
+        this.physics.add.existing(rect);
+        rect.body.setCollideWorldBounds(true);
+
+        // Make remote player collide with walls
+        if (this.wallsGroup) {
+            this.physics.add.collider(rect, this.wallsGroup);
+        }
 
         // Store player data
-        remotePlayer.playerId = playerData.id;
-        remotePlayer.charId = playerData.charId;
-        remotePlayer.direction = playerData.direction;
-        remotePlayer.action = playerData.action;
+        rect.playerId = playerData.id;
+        rect.charId = playerData.charId;
+        rect.action = playerData.action;
+        rect.direction = playerData.direction;
 
-        this.players.set(playerData.id, remotePlayer);
+        this.players.set(playerData.id, rect);
 
-        console.log('👥 Remote player added:', playerData.id, 'with Tiled map collision');
+        console.log('✅ Remote player added as red rectangle:', playerData.id, 'at', playerData.x, playerData.y);
     }
 
     updateRemotePlayer(moveData) {
         const player = this.players.get(moveData.id);
         if (!player) return;
 
-        // Smoothly move player to new position
-        this.tweens.add({
-            targets: player,
-            x: moveData.x,
-            y: moveData.y,
-            duration: 100,
-            ease: 'Linear'
-        });
+        // Smooth interpolation for remote player position
+        player.x = Phaser.Math.Linear(player.x, moveData.x, 0.6);
+        player.y = Phaser.Math.Linear(player.y, moveData.y, 0.6);
 
         // Update player state
-        player.direction = moveData.direction;
         player.action = moveData.action;
+        player.direction = moveData.direction;
 
         // Update visual feedback
         if (moveData.action === 'walk') {
-            player.setTint(0xff8800); // Orange when moving
+            player.setFillStyle(0xff8800); // Orange when moving
         } else {
-            player.setTint(0xff0000); // Red when idle
+            player.setFillStyle(0xff4444); // Red when idle
         }
     }
 

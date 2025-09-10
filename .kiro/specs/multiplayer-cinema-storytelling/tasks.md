@@ -42,117 +42,138 @@
   - There should only be 2 play options: quiz game and solo. No story mode.
   - The quiz game flow should remain same but as for clicking on the movie to play; we should navigate to the character selection page for that movie for playing the quiz game.
 
-- [x] 4. Implement correct navigation
+
+- [x] 4. Create advanced story page UI with animations in existing solo play mode
 
 
 
 
 
-  - Movie selection and character selection screens for quiz-game should follow new styles, not the old ones.
-  - When we choose a movie from our collection of movies to play, we are aiming to play the quiz-game and not the old /multiplayer game.
-  - When we select a movie diretly from the movie collection, it should bypass the movie selection page of the quiz and go straight to the character selection page for the movie'es quiz game.
-  - remove the old multiplayer game screens and keep only quiz-game and solo game.
+  - Build roadmap-style story progression interface with content on alternating sides
+  - Implement smooth animations for content appearance and choice transitions (framer motion is already installed)
+  - Create responsive layout that works on mobile and desktop devices
+  - Write component tests for story page UI interactions
+  - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8_
+
+- [x] 4.1 Build roadmap-style story layout
 
 
-- [ ] 3. Implement core data models and interfaces
-  - Define TypeScript interfaces for GameRoom, Player, StoryState, and Movie structures
-  - Create validation functions for all data models
-  - Implement utility functions for game state management
-  - Write unit tests for data model validation and utilities
-  - _Requirements: 1.2, 2.2, 3.1, 5.1_
+  - Create progressive story display with content alternating between left and right sides
+  - Implement initial base content display that appears first
+  - Design choice selection interface that integrates with story flow
+  - Use sample images from /steering/Image generation art style
+  - _Requirements: 11.1, 11.2, 11.4_
 
-- [ ] 4. Set up Redis integration and room management
+- [x] 4.2 Implement advanced animations and transitions
+
+
+  - Add smooth content appearance animations inspired by /steering/advanceAnimationExample.md
+  - Create choice disappearance animations after selection
+  - Implement visual feedback for user interactions and loading states
+  - _Requirements: 11.5, 11.6, 11.7, 11.8_
+
+- [x] 4.3 Improve UI
+
+
+  - Content layout should be inpired from these 2: ![alt text](image.png) and ![alt text](image-1.png)
+  - Content text boxes should not have images, instead the images should be opposite to the content
+  - The content should be proper paragraghs and should not look like sqaured boxes
+  - Do not assume images names for visual images, use images from /steering/Image generation art style/
+  - The page colors may be changed. This type of theme might be used ![alt text](image-2.png) where the background is a bit black with grain effect
+  - remove errors
+
+- [ ] 6. Set up Redis integration and room management
   - Configure Redis connection and error handling
   - Implement RoomManager service with create, join, leave, and update operations
   - Create Redis key structure for rooms, players, and game states
   - Write unit tests for room management operations
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 5.3_
 
-- [ ] 5. Create Socket.io server integration with Next.js
+- [ ] 7. Create Socket.io server integration with Next.js
   - Set up custom Next.js server with Socket.io integration
   - Implement WebSocket event handlers for room operations
   - Create connection management and player tracking system
   - Write integration tests for WebSocket connections and events
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 6. Implement AI content generation services
-  - Create AIService with OpenAI API integration for text generation
-  - Implement image generation using DALL-E API
-  - Add content validation and fallback mechanisms
-  - Write unit tests with mocked AI services
-  - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+- [ ] 8. Implement AI image generation services
+  - Create image generation service using DALL-E API for scene visuals
+  - Implement pixel art style generation following /steering/ art style guidelines
+  - Add image validation and fallback mechanisms for generation failures
+  - Write unit tests with mocked AI image services
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-- [ ] 7. Build story engine and game logic
+- [ ] 9. Build story engine and game logic
   - Implement StoryEngine service for processing choices and managing story flow
   - Create turn rotation logic for multiplayer mode
   - Implement story completion detection and alternate script generation
   - Write unit tests for story processing and turn management
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 4.2, 4.3, 4.4_
 
-- [ ] 8. Create main page and room creation interface
+- [ ] 10. Create main page and room creation interface
   - Build HomePage component with create/join room options
   - Implement MovieSelector component for movie selection
   - Create room creation API route with mode selection (single/multiplayer)
   - Write component tests for main page interactions
   - _Requirements: 1.1, 4.1, 7.1_
 
-- [ ] 9. Implement room joining functionality
+- [ ] 11. Implement room joining functionality
   - Create RoomCodeInput component for entering room codes
   - Build room joining API route with validation
   - Implement error handling for invalid codes and full rooms
   - Write integration tests for room joining flow
   - _Requirements: 1.3, 1.4, 7.1_
 
-- [ ] 10. Build character selection interface
+- [ ] 12. Build character selection interface
   - Create CharacterSelectionPage component
   - Implement CharacterCard components with real-time availability updates
   - Build character assignment API routes
   - Write component tests for character selection interactions
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 11. Create main game room interface
+- [ ] 13. Create main game room interface
   - Build GameRoomPage component with story display area
   - Implement StoryDisplay component for generated content
   - Create PlayerList component showing current players and turn indicator
   - Write component tests for game room UI elements
   - _Requirements: 7.2, 5.2_
 
-- [ ] 12. Implement choice selection and story progression
+- [ ] 14. Implement choice selection and story progression
   - Create ChoiceButtons component for interactive choice selection
   - Build choice processing API routes
   - Implement real-time story updates via WebSocket
   - Write integration tests for choice processing and story updates
   - _Requirements: 3.1, 3.2, 3.3, 5.1_
 
-- [ ] 13. Add AI content generation integration
-  - Integrate AI services with story progression system
+- [ ] 15. Add AI content generation integration
+  - Integrate Gemini and image generation services with story progression system
   - Implement loading states for content generation
   - Add visual content display for generated images
   - Write integration tests for AI content generation flow
-  - _Requirements: 6.1, 6.2, 6.3, 6.4_
+  - _Requirements: 10.1, 10.2, 10.3, 10.4, 9.1, 9.2_
 
-- [ ] 14. Implement real-time multiplayer synchronization
+- [ ] 16. Implement real-time multiplayer synchronization
   - Create SocketProvider for WebSocket connection management
   - Implement GameStateProvider for real-time state synchronization
   - Add player join/leave notifications
   - Write end-to-end tests for multiplayer synchronization
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 15. Build story completion and sharing features
+- [ ] 17. Build story completion and sharing features
   - Create StoryCompletePage component for final story display
   - Implement story saving and sharing functionality
   - Add options to restart or create new rooms
   - Write component tests for story completion interface
   - _Requirements: 4.4, 7.5_
 
-- [ ] 16. Add comprehensive error handling and fallbacks
+- [ ] 18. Add comprehensive error handling and fallbacks
   - Implement client-side error handling with reconnection logic
   - Add server-side error handling for AI failures and disconnections
   - Create fallback content for AI generation failures
   - Write error handling tests and recovery scenarios
-  - _Requirements: 6.5, 8.5_
+  - _Requirements: 10.7, 9.7, 8.5_
 
-- [ ] 17. Implement performance optimizations and cleanup
+- [ ] 19. Implement performance optimizations and cleanup
   - Add automatic room cleanup for inactive sessions
   - Implement memory management for active connections
   - Add rate limiting for API endpoints

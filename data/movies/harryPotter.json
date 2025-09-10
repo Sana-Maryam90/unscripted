@@ -1,0 +1,65 @@
+{
+    "movie": "Harry Potter (Series)",
+    "characters": [
+      "Harry Potter",
+      "Hermione Granger",
+      "Ron Weasley",
+      "Draco Malfoy",
+      "Severus Snape",
+      "Lord Voldemort",
+      "Dumbledore"
+    ],
+    "scenes": [
+      {
+        "id": 1,
+        "title": "The Troll in the Dungeon",
+        "context": "A massive mountain troll enters Hogwarts on Halloween night. The students are panicking as the troll wreaks havoc in the bathroom."
+      },
+      {
+        "id": 2,
+        "title": "The Philosopher's Stone",
+        "context": "Harry, Hermione, and Ron face the final chamber protecting the Philosopher's Stone, with Harry confronting Professor Quirrell and Voldemort’s spirit."
+      },
+      {
+        "id": 3,
+        "title": "The Chamber of Secrets",
+        "context": "Harry encounters Tom Riddle and the Basilisk inside the Chamber of Secrets. The giant serpent slithers closer."
+      },
+      {
+        "id": 4,
+        "title": "The Time-Turner Rescue",
+        "context": "Harry and Hermione use the Time-Turner to save Sirius Black and Buckbeak. They must avoid being seen by their past selves."
+      },
+      {
+        "id": 5,
+        "title": "The Triwizard Tournament - The Maze",
+        "context": "Harry and Cedric enter the Triwizard Maze, filled with dangerous enchantments and creatures, leading to Voldemort’s rebirth."
+      },
+      {
+        "id": 6,
+        "title": "Dumbledore vs Voldemort",
+        "context": "At the Ministry of Magic, Dumbledore and Voldemort duel fiercely, with Harry caught in the chaos."
+      },
+      {
+        "id": 7,
+        "title": "The Astronomy Tower",
+        "context": "On the Astronomy Tower, Draco confronts Dumbledore, but Death Eaters arrive. Snape’s true allegiance is unclear."
+      },
+      {
+        "id": 8,
+        "title": "Battle of Hogwarts",
+        "context": "Hogwarts is under siege. Students, professors, Death Eaters, and creatures fight in an all-out war."
+      },
+      {
+        "id": 9,
+        "title": "The Forbidden Forest",
+        "context": "Harry willingly walks into the Forbidden Forest to sacrifice himself to Voldemort, clutching the Resurrection Stone."
+      },
+      {
+        "id": 10,
+        "title": "Final Duel",
+        "context": "Harry and Voldemort face off in their climactic final duel. The fate of the wizarding world hangs in the balance."
+      }
+    ]
+  }
+  

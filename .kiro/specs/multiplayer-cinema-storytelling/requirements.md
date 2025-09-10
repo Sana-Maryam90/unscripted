@@ -68,15 +68,18 @@ The Multiplayer Cinema Storytelling Game is an AI-powered web platform that allo
 
 ### Requirement 6
 
-**User Story:** As a player, I want to see AI-generated visuals and story content, so that the alternate storylines feel immersive and engaging.
+**User Story:** As a player, I want to see AI-generated story content that adapts to my choices, so that the alternate storylines feel immersive and engaging.
 
 #### Acceptance Criteria
 
-1. WHEN a choice affects the story THEN the AI SHALL generate contextually appropriate story text
-2. WHEN new scenes are created THEN the system SHALL generate corresponding visual elements
-3. WHEN story segments are generated THEN they SHALL maintain consistency with the character's POV
-4. WHEN visuals are created THEN they SHALL match the tone and style of the original movie
-5. IF AI generation fails THEN the system SHALL provide fallback content and retry
+1. WHEN creating a story THEN the AI SHALL lay out the base content at the start of the page
+2. WHEN writing the base content THEN the AI SHALL describe it exactly as the original work
+3. WHEN presenting choices to player THEN these choices SHALL be relevant to player character
+4. WHEN generating choices THEN these choices SHALL NOT be general (e.g. act bravely, think clearly, act with empathy) and SHALL be specific to the context (e.g. open the door and enter the dark room)
+5. WHEN a choice affects the story THEN the AI SHALL generate contextually appropriate story text
+6. WHEN story segments are generated THEN they SHALL maintain consistency with the character's POV
+7. WHEN story content is generated THEN it SHALL maintain narrative coherence with previous segments
+8. IF AI generation fails THEN the system SHALL provide fallback content and retry
 
 ### Requirement 7
 
@@ -96,8 +99,53 @@ The Multiplayer Cinema Storytelling Game is an AI-powered web platform that allo
 
 #### Acceptance Criteria
 
-1. WHEN selecting a movie THEN the system SHALL load preloaded story scripts with defined checkpoints
+1. WHEN selecting a movie THEN the system SHALL randomly select a movie scene from defined scenes in the movie data
 2. WHEN a room is created THEN character data and movie information SHALL be readily available
-3. WHEN generating content THEN the system SHALL maintain acceptable response times for AI operations
+3. WHEN generating content THEN the system SHALL maintain acceptable response times for AI operations (under 10 seconds)
 4. WHEN multiple rooms are active THEN the system SHALL handle concurrent gameplay without performance degradation
 5. IF content loading fails THEN the system SHALL provide appropriate error messages and retry options
+
+
+### Requirement 9
+
+**User Story:** As a player, I want to see AI-generated visuals, so that the alternate storylines feel immersive and engaging.
+
+#### Acceptance Criteria
+
+1. WHEN new plots are created THEN the system SHALL generate corresponding visual elements
+2. WHEN generating visuals THEN these should be pixels style and must be context specific
+3. WHEN generating visuals THEN the same art style should be followed as in /steering/ Image generation art style
+4. WHEN generating visuals THEN these visuals must be of relevant character or items in the context
+5. WHEN visuals are created THEN they SHALL match the tone and style of the original movie
+6. WHEN generating visuals THEN these should be in png formats
+7. IF AI generation fails THEN the system SHALL provide fallback content and retry
+
+
+### Requirement 10
+
+**User Story:** As a player, I want the system to use Gemini AI for story generation, so that I can experience dynamic and contextually appropriate narrative content.
+
+#### Acceptance Criteria
+
+1. WHEN starting a story session THEN the system SHALL use Gemini API to select a random scene from harryPotter.json
+2. WHEN describing base content THEN the AI SHALL describe the scene exactly as written in the source material
+3. WHEN generating character choices THEN the AI SHALL create character-relative options for the player
+4. WHEN processing player choices THEN the AI SHALL generate the next narrative segment based on context and choice
+5. WHEN continuing the story THEN the system SHALL repeat the choice-generation cycle for at least 4-5 iterations
+6. WHEN generating content THEN each story segment SHALL contain at least one full paragraph of professionally written text
+7. IF Gemini API fails THEN the system SHALL provide fallback content and retry the request
+
+### Requirement 11
+
+**User Story:** As a player, I want to see advanced UI and animations in the story page, so that the storytelling experience feels polished and engaging.
+
+#### Acceptance Criteria
+
+1. WHEN designing the page UI THEN it SHALL be similar to the roadmap-type UI samples and wireframes in /steering/
+2. WHEN designing story page THEN initially only the base content SHALL appear
+3. WHEN progressing the story THEN player choice options SHALL disappear after they select and next AI generated content SHALL proceed
+4. WHEN text content and visual content is generated THEN they SHALL appear on a roadmap where image on one side and text content is wrapped around
+5. WHEN laying out content THEN the progression SHALL have advanced artistic animations
+6. WHEN making story page THEN advanced animations style inspiration SHALL be taken from /steering/advanceAnimationExample.md
+7. WHEN content appears THEN it SHALL animate smoothly into view with appropriate transitions
+8. WHEN choices are made THEN the interface SHALL provide visual feedback for user actions

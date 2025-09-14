@@ -43,7 +43,7 @@ export class StoryEngine {
         1000
       );
 
-      // Initialize story state
+      // Initialize enhanced story state with proper context storage
       const storyState = {
         roomId,
         scene: selectedScene,
@@ -54,8 +54,36 @@ export class StoryEngine {
         currentPlayerIndex: 0,
         isActive: true,
         createdAt: new Date().toISOString(),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        // Enhanced context storage for AI continuity
+        storyContext: {
+          originalScene: selectedScene,
+          plotDeviations: [],
+          characterDevelopments: {},
+          keyEvents: [],
+          narrativeThemes: [],
+          worldState: {}
+        },
+        // Track all choices and their consequences for context
+        choiceHistory: [],
+        // Maintain narrative continuity
+        narrativeContinuity: {
+          previousSegmentSummary: baseContent,
+          currentTone: 'neutral',
+          characterRelationships: {},
+          plotThreads: []
+        }
       };
+
+      // Initialize character developments
+      characters.forEach(char => {
+        storyState.storyContext.characterDevelopments[char.name || char.id] = {
+          initialState: char.description || 'Unknown character',
+          currentState: char.description || 'Unknown character',
+          choicesMade: [],
+          personalityTraits: char.personality ? char.personality.split(', ') : []
+        };
+      });
 
       // Store in active stories
       this.activeStories.set(roomId, storyState);
@@ -76,21 +104,38 @@ export class StoryEngine {
    */
   async generateChoicesForPlayer(roomId, character) {
     try {
+      console.log(`🎯 Generating choices for ${character} in room ${roomId}`);
+      console.log(`📊 Active stories: ${Array.from(this.activeStories.keys()).join(', ')}`);
+      
       const storyState = this.activeStories.get(roomId);
       if (!storyState) {
+        console.error(`❌ Story not found for room ${roomId}. Available rooms: ${Array.from(this.activeStories.keys()).join(', ')}`);
         throw new Error('Story not found');
       }
 
-      console.log(`🎯 Generating choices for ${character} in room ${roomId}`);
-
+      // Enhanced context with full story progression
       const context = {
         scene: storyState.scene,
         previousChoices: storyState.segments.map(seg => ({
           character: seg.character,
-          choice: seg.choice
+          choice: seg.choice,
+          outcome: seg.content
         })),
         sceneDescription: storyState.baseContent,
-        turnCount: storyState.turnCount
+        turnCount: storyState.turnCount,
+        // Enhanced context for better AI continuity
+        storyContext: storyState.storyContext,
+        choiceHistory: storyState.choiceHistory,
+        narrativeContinuity: storyState.narrativeContinuity,
+        characterDevelopment: storyState.storyContext.characterDevelopments[character] || {},
+        // Recent story summary for immediate context
+        recentEvents: storyState.segments.slice(-3).map(seg => ({
+          character: seg.character,
+          action: seg.choice?.text,
+          result: seg.content
+        })),
+        // Current world state
+        worldState: storyState.storyContext.worldState
       };
 
       const choices = await retryWithBackoff(
@@ -116,23 +161,33 @@ export class StoryEngine {
    */
   async processPlayerChoice(roomId, character, choice) {
     try {
+      console.log(`⚡ Processing choice for ${character} in room ${roomId}: ${choice.text}`);
+      console.log(`📊 Active stories: ${Array.from(this.activeStories.keys()).join(', ')}`);
+      
       const storyState = this.activeStories.get(roomId);
       if (!storyState) {
+        console.error(`❌ Story not found for room ${roomId}. Available rooms: ${Array.from(this.activeStories.keys()).join(', ')}`);
         throw new Error('Story not found');
       }
-
-      console.log(`⚡ Processing choice for ${character} in room ${roomId}: ${choice.text}`);
 
       // Increment turn count
       storyState.turnCount += 1;
 
-      // Generate story segment based on choice
+      // Enhanced choice context with full story progression
       const choiceContext = {
         choice,
         character,
         scene: storyState.scene,
         previousSegments: storyState.segments,
-        turnCount: storyState.turnCount
+        turnCount: storyState.turnCount,
+        // Enhanced context for better continuity
+        storyContext: storyState.storyContext,
+        narrativeContinuity: storyState.narrativeContinuity,
+        characterDevelopment: storyState.storyContext.characterDevelopments[character] || {},
+        // Full choice history for context
+        choiceHistory: storyState.choiceHistory,
+        // Recent narrative summary
+        recentNarrative: storyState.segments.slice(-2).map(seg => seg.content).join(' ')
       };
 
       const newSegment = await retryWithBackoff(
@@ -143,6 +198,40 @@ export class StoryEngine {
 
       // Add segment to story
       storyState.segments.push(newSegment);
+
+      // Update choice history with full context
+      storyState.choiceHistory.push({
+        character,
+        choice,
+        turnNumber: storyState.turnCount,
+        timestamp: new Date().toISOString(),
+        outcome: newSegment.content,
+        consequences: choice.reasoning || 'Character decision'
+      });
+
+      // Update character development
+      if (storyState.storyContext.characterDevelopments[character]) {
+        storyState.storyContext.characterDevelopments[character].choicesMade.push({
+          choice: choice.text,
+          reasoning: choice.reasoning,
+          turnNumber: storyState.turnCount
+        });
+      }
+
+      // Update narrative continuity
+      storyState.narrativeContinuity.previousSegmentSummary = newSegment.content;
+      storyState.narrativeContinuity.currentTone = this.analyzeTone(newSegment.content);
+
+      // Track key events based on choice reasoning
+      if (choice.reasoning) {
+        storyState.storyContext.keyEvents.push({
+          event: choice.text,
+          character,
+          reasoning: choice.reasoning,
+          turnNumber: storyState.turnCount
+        });
+      }
+
       storyState.lastUpdated = new Date().toISOString();
 
       // Manage story cycle
@@ -217,6 +306,19 @@ export class StoryEngine {
   }
 
   /**
+   * Checks if a story exists and provides debugging info
+   * @param {string} roomId - Room identifier
+   * @returns {boolean} Whether story exists
+   */
+  hasStory(roomId) {
+    const exists = this.activeStories.has(roomId);
+    console.log(`🔍 Story check for ${roomId}: ${exists ? 'EXISTS' : 'NOT FOUND'}`);
+    console.log(`📊 Total active stories: ${this.activeStories.size}`);
+    console.log(`🗂️ Active room IDs: ${Array.from(this.activeStories.keys()).join(', ')}`);
+    return exists;
+  }
+
+  /**
    * Removes a story from active stories (cleanup)
    * @param {string} roomId - Room identifier
    */
@@ -231,6 +333,27 @@ export class StoryEngine {
    */
   getActiveStoryRooms() {
     return Array.from(this.activeStories.keys());
+  }
+
+  /**
+   * Analyzes the tone of a story segment
+   * @param {string} content - Story content to analyze
+   * @returns {string} Detected tone
+   */
+  analyzeTone(content) {
+    const lowerContent = content.toLowerCase();
+    
+    if (lowerContent.includes('danger') || lowerContent.includes('fear') || lowerContent.includes('threat')) {
+      return 'tense';
+    } else if (lowerContent.includes('joy') || lowerContent.includes('happy') || lowerContent.includes('smile')) {
+      return 'joyful';
+    } else if (lowerContent.includes('mystery') || lowerContent.includes('secret') || lowerContent.includes('unknown')) {
+      return 'mysterious';
+    } else if (lowerContent.includes('magic') || lowerContent.includes('wonder') || lowerContent.includes('amazing')) {
+      return 'magical';
+    } else {
+      return 'neutral';
+    }
   }
 
   /**

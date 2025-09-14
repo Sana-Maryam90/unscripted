@@ -52,41 +52,41 @@ const movieData = {
             {
               id: 'choice-1a',
               text: 'Ask Hagrid about his parents immediately',
-              impact: 'eager for truth'
+              reasoning: 'eager for truth'
             },
             {
               id: 'choice-1b',
               text: 'Focus on learning about the wizarding world first',
-              impact: 'cautious curiosity'
+              reasoning: 'cautious curiosity'
             },
             {
               id: 'choice-1c',
               text: 'Express anger at the Dursleys for lying',
-              impact: 'confrontational'
+              reasoning: 'confrontational'
             }
           ],
           'hermione': [
             {
               id: 'choice-1d',
               text: 'Research everything about Hogwarts immediately',
-              impact: 'thorough preparation'
+              reasoning: 'thorough preparation'
             },
             {
               id: 'choice-1e',
               text: 'Help Harry understand his situation',
-              impact: 'supportive friendship'
+              reasoning: 'supportive friendship'
             }
           ],
           'ron': [
             {
               id: 'choice-1f',
               text: 'Share stories about wizard life',
-              impact: 'cultural bridge'
+              reasoning: 'cultural bridge'
             },
             {
               id: 'choice-1g',
               text: 'Invite Harry to the Burrow',
-              impact: 'family inclusion'
+              reasoning: 'family inclusion'
             }
           ]
         }
@@ -101,26 +101,26 @@ const movieData = {
             {
               id: 'choice-2a',
               text: 'Spend extra time in Ollivanders learning about wands',
-              impact: 'magical knowledge focus'
+              reasoning: 'magical knowledge focus'
             },
             {
               id: 'choice-2b',
               text: 'Explore Knockturn Alley despite warnings',
-              impact: 'rebellious curiosity'
+              reasoning: 'rebellious curiosity'
             }
           ],
           'hermione': [
             {
               id: 'choice-2c',
               text: 'Buy extra books for advanced study',
-              impact: 'academic excellence'
+              reasoning: 'academic excellence'
             }
           ],
           'ron': [
             {
               id: 'choice-2d',
               text: 'Show Harry the best wizard candy',
-              impact: 'fun friendship'
+              reasoning: 'fun friendship'
             }
           ]
         }
@@ -135,12 +135,12 @@ const movieData = {
             {
               id: 'choice-3a',
               text: 'Accept Slytherin and embrace ambition',
-              impact: 'dark path potential'
+              reasoning: 'dark path potential'
             },
             {
               id: 'choice-3b',
               text: 'Strongly request Gryffindor',
-              impact: 'brave determination'
+              reasoning: 'brave determination'
             }
           ]
         }
@@ -191,12 +191,12 @@ const movieData = {
             {
               id: 'choice-1a',
               text: 'Immediately seek out Ben Kenobi',
-              impact: 'proactive heroism'
+              reasoning: 'proactive heroism'
             },
             {
               id: 'choice-1b',
               text: 'Try to convince Uncle Owen to help',
-              impact: 'family loyalty'
+              reasoning: 'family loyalty'
             }
           ]
         }
@@ -240,7 +240,7 @@ const movieData = {
             {
               id: 'choice-1a',
               text: 'Organize a secret search party with the boys',
-              impact: 'independent action'
+              reasoning: 'independent action'
             }
           ]
         }
@@ -284,12 +284,12 @@ const movieData = {
             {
               id: 'choice-1a',
               text: 'Accept defeat gracefully and befriend Leslie',
-              impact: 'friendship building'
+              reasoning: 'friendship building'
             },
             {
               id: 'choice-1b',
               text: 'Feel embarrassed and avoid Leslie',
-              impact: 'missed opportunity'
+              reasoning: 'missed opportunity'
             }
           ]
         }
@@ -333,12 +333,12 @@ const movieData = {
             {
               id: 'choice-1a',
               text: 'Try to sit with the popular kids at lunch',
-              impact: 'social climbing'
+              reasoning: 'social climbing'
             },
             {
               id: 'choice-1b',
               text: 'Stick with Rowley and be content',
-              impact: 'friendship loyalty'
+              reasoning: 'friendship loyalty'
             }
           ]
         }

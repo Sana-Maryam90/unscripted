@@ -21,7 +21,11 @@ export async function getAllMovies() {
             }
         }
 
-        return movies.sort((a, b) => a.title.localeCompare(b.title));
+        return movies.sort((a, b) => {
+            const titleA = a.title || a.movie || 'Untitled';
+            const titleB = b.title || b.movie || 'Untitled';
+            return titleA.localeCompare(titleB);
+        });
     } catch (error) {
         console.error('Error loading movies:', error);
         return [];

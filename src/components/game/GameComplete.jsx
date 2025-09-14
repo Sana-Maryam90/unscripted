@@ -227,12 +227,9 @@ const GameComplete = ({ session, currentPlayer }) => {
                             <span className="text-white ml-1">{player.choicesMade}</span>
                           </div>
                           <div>
-                            <span className="text-gray-400">Impact:</span>
-                            <span className={`ml-1 ${
-                              player.impactLevel === 'High' ? 'text-green-400' :
-                              player.impactLevel === 'Medium' ? 'text-yellow-400' : 'text-gray-400'
-                            }`}>
-                              {player.impactLevel}
+                            <span className="text-gray-400">Character:</span>
+                            <span className="ml-1 text-purple-400">
+                              {player.characterName || 'Unknown'}
                             </span>
                           </div>
                         </div>

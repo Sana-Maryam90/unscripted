@@ -121,6 +121,23 @@
       }
     }
   ],
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Meeting Leslie",
+      "context": "Jess meets the new girl Leslie Burke. Leslie beats Jess in the race he's been training for all summer, and he must decide how to react to this unexpected challenge."
+    },
+    {
+      "id": 2,
+      "title": "Creating Terabithia",
+      "context": "Jess and Leslie discover their secret kingdom. Leslie suggests creating an imaginary kingdom in the woods, and they must decide how to build their magical world."
+    },
+    {
+      "id": 3,
+      "title": "The Storm",
+      "context": "A dangerous storm threatens their access to Terabithia. Heavy rains have made the creek dangerous, but Leslie wants to visit Terabithia. Jess must make a crucial decision."
+    }
+  ],
   "baseScript": "Jess Aarons has been practicing all summer to become the fastest runner in the fifth grade...",
   "themes": ["friendship", "imagination", "loss", "growing up", "creativity"],
   "difficulty": "intermediate",

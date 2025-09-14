@@ -6,7 +6,7 @@ import Container from '../ui/Container';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 
-const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
+const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode = false }) => {
   const [storySegments, setStorySegments] = useState([]);
   const [currentChoices, setCurrentChoices] = useState([]);
   const [isMyTurn, setIsMyTurn] = useState(false);
@@ -17,49 +17,73 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
   const [showChoices, setShowChoices] = useState(false);
   const storyRef = useRef(null);
 
-  // Initialize with base content
+  // Initialize with AI-generated base content
   useEffect(() => {
-    if (storySegments.length === 0) {
-      // Base content appears first as per requirement 11.2
-      setStorySegments([
-        {
-          id: 'base-content',
-          type: 'narrative',
-          content: `The Great Hall of Hogwarts stands before you, its enchanted ceiling reflecting the starry night sky. Hundreds of candles float in mid-air, casting dancing shadows across the four long house tables. Professor McGonagall holds the ancient Sorting Hat, its brim worn and patched from centuries of use. This is the moment that will define your destiny at Hogwarts School of Witchcraft and Wizardry. The original story begins here, but your choices will reshape everything that follows...`,
-          image: '/.kiro/steering/Image generation art style/pixel eg.png',
-          timestamp: new Date(),
-          side: 'center', // Base content starts in center
-          isBaseContent: true
-        }
-      ]);
+    const initializeStory = async () => {
+      if (storySegments.length === 0 && session?.storyState) {
+        try {
+          const { storyState } = session;
+          
+          // Create base content segment from AI-generated content
+          const baseSegment = {
+            id: 'base-content',
+            type: 'narrative',
+            content: storyState.baseContent || `Welcome to ${session.movieTitle}! Your adventure begins...`,
+            image: getRandomArtStyleImage(),
+            timestamp: new Date(),
+            side: 'center',
+            isBaseContent: true
+          };
 
-      // Set initial choices - these will appear after base content
-      setCurrentChoices([
-        {
-          id: 'choice-1',
-          text: 'Step forward boldly when your name is called',
-          impact: 'Show confidence and leadership'
-        },
-        {
-          id: 'choice-2', 
-          text: 'Wait nervously and watch other students first',
-          impact: 'Learn from observation'
-        },
-        {
-          id: 'choice-3',
-          text: 'Try to catch Harry Potter\'s eye for reassurance',
-          impact: 'Seek connection with the famous wizard'
-        }
-      ]);
+          setStorySegments([baseSegment]);
 
-      // Animate base content appearing first
-      setTimeout(() => {
-        setVisibleSegments(1);
-        // Show choices after base content is visible
-        setTimeout(() => setShowChoices(true), 1500);
-      }, 800);
-    }
-  }, [session.movieTitle]);
+          // Generate initial choices using AI via API
+          if (currentPlayer?.characterName) {
+            setIsLoading(true);
+            try {
+              // Use different API endpoint for solo mode vs multiplayer
+              const apiEndpoint = session.isSoloMode ? '/api/story/solo/choices' : '/api/story/choices';
+              const requestBody = session.isSoloMode 
+                ? { sessionId: session.id, character: currentPlayer.characterName }
+                : { roomId: session.id, character: currentPlayer.characterName };
+
+              const response = await fetch(apiEndpoint, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+              });
+
+              if (response.ok) {
+                const { choices } = await response.json();
+                setCurrentChoices(choices);
+              } else {
+                throw new Error('Failed to generate choices');
+              }
+            } catch (error) {
+              console.error('Error generating initial choices:', error);
+              // Use contextual fallback choices
+              setCurrentChoices(generateFallbackChoices());
+            } finally {
+              setIsLoading(false);
+            }
+          }
+
+          // Animate base content appearing first
+          setTimeout(() => {
+            setVisibleSegments(1);
+            // Show choices after base content is visible
+            setTimeout(() => setShowChoices(true), 1500);
+          }, 800);
+        } catch (error) {
+          console.error('Error initializing story:', error);
+        }
+      }
+    };
+
+    initializeStory();
+  }, [session?.storyState, currentPlayer?.characterName]);
 
   // Check if it's current player's turn
   useEffect(() => {
@@ -113,75 +137,139 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
 
     // Animate choice selection and story progression
     setTimeout(async () => {
-      // Add player choice to story
-      const choiceSegment = {
-        id: `choice-${Date.now()}`,
-        type: 'choice',
-        content: `${currentPlayer.name} chose: "${choice.text}"`,
-        player: currentPlayer.name,
-        character: getCurrentCharacterName(),
-        choice: choice,
-        timestamp: new Date(),
-        side: storySegments.length % 2 === 0 ? 'left' : 'right'
-      };
+      try {
+        // Skip adding choice segment - go directly to AI response
 
-      // Generate AI response (mock for now)
-      const aiSegment = {
-        id: `ai-${Date.now()}`,
-        type: 'narrative',
-        content: generateAIResponse(choice),
-        image: generateMockImage(choice),
-        timestamp: new Date(),
-        side: (storySegments.length + 1) % 2 === 0 ? 'left' : 'right'
-      };
+        // Process choice with AI story engine via API
+        const apiEndpoint = session.isSoloMode ? '/api/story/solo/process-choice' : '/api/story/process-choice';
+        const requestBody = session.isSoloMode 
+          ? { sessionId: session.id, character: currentPlayer.characterName || currentPlayer.name, choice }
+          : { roomId: session.id, character: currentPlayer.characterName || currentPlayer.name, choice };
 
-      // Update story segments with staggered animation
-      setStorySegments(prev => [...prev, choiceSegment]);
-      
-      // Add AI segment after choice segment appears
-      setTimeout(() => {
-        setStorySegments(prev => [...prev, aiSegment]);
-        setVisibleSegments(prev => prev + 2);
-      }, 800);
+        const response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
 
-      // Clear choices temporarily
-      setCurrentChoices([]);
-      
-      // Generate new choices after a delay
-      setTimeout(() => {
-        if (storySegments.length < 8) { // Continue for 4-5 iterations
-          setCurrentChoices(generateNewChoices());
-          setShowChoices(true);
-        } else {
-          // Story complete
-          const updatedSession = {
-            ...session,
-            state: 'completed'
-          };
-          onSessionUpdate(updatedSession);
+        if (!response.ok) {
+          throw new Error('Failed to process choice');
         }
+
+        const { result, completionResult } = await response.json();
+
+        // Create AI-generated segment
+        const aiSegment = {
+          id: `ai-${Date.now()}`,
+          type: 'narrative',
+          content: result.newSegment.content,
+          image: getRandomArtStyleImage(),
+          timestamp: new Date(),
+          side: (storySegments.length + 1) % 2 === 0 ? 'left' : 'right',
+          aiGenerated: true
+        };
+
+        // Update story segments directly with AI response (no choice confirmation)
+        setStorySegments(prev => [...prev, aiSegment]);
+        setVisibleSegments(prev => prev + 1);
+
+        // Clear choices temporarily
+        setCurrentChoices([]);
+        
+        // Generate new choices after a delay
+        setTimeout(async () => {
+          if (!completionResult.isComplete && result.storyState.shouldContinue) {
+            try {
+              const apiEndpoint = session.isSoloMode ? '/api/story/solo/choices' : '/api/story/choices';
+              const requestBody = session.isSoloMode 
+                ? { sessionId: session.id, character: currentPlayer.characterName || currentPlayer.name }
+                : { roomId: session.id, character: currentPlayer.characterName || currentPlayer.name };
+
+              const choicesResponse = await fetch(apiEndpoint, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+              });
+
+              if (choicesResponse.ok) {
+                const { choices } = await choicesResponse.json();
+                setCurrentChoices(choices);
+                setShowChoices(true);
+              } else {
+                throw new Error('Failed to generate new choices');
+              }
+            } catch (error) {
+              console.error('Error generating new choices:', error);
+              // Fallback to completion if choice generation fails
+              const updatedSession = {
+                ...session,
+                state: 'completed',
+                storyState: result.storyState
+              };
+              onSessionUpdate(updatedSession);
+            }
+          } else {
+            // Story complete
+            const updatedSession = {
+              ...session,
+              state: 'completed',
+              storyState: completionResult.storyState,
+              conclusion: completionResult.conclusion
+            };
+            onSessionUpdate(updatedSession);
+          }
+          setIsLoading(false);
+          setSelectedChoice(null);
+          setTimeLeft(300);
+        }, 2500);
+
+        // Update session with new story state
+        const updatedSession = {
+          ...session,
+          currentTurn: getNextPlayer(),
+          storyProgress: {
+            ...session.storyProgress,
+            currentCheckpoint: result.storyState.turnCount,
+            completedChoices: [...(session.storyProgress?.completedChoices || []), choice]
+          },
+          storyState: result.storyState
+        };
+        onSessionUpdate(updatedSession);
+
+      } catch (error) {
+        console.error('Error processing choice:', error);
         setIsLoading(false);
         setSelectedChoice(null);
-        setTimeLeft(300);
-      }, 2500);
+        
+        // Fallback: generate simple response without choice confirmation
+        const fallbackSegment = {
+          id: `fallback-${Date.now()}`,
+          type: 'narrative',
+          content: `The magical world responds to your decision. ${choice.text.replace('I ', 'You ')}. The story continues as new possibilities unfold, and the ancient magic of Hogwarts seems to pulse with renewed energy around you...`,
+          image: getRandomArtStyleImage(),
+          timestamp: new Date(),
+          side: (storySegments.length + 1) % 2 === 0 ? 'left' : 'right',
+          fallback: true
+        };
 
-      // Update session
-      const updatedSession = {
-        ...session,
-        currentTurn: getNextPlayer(),
-        storyProgress: {
-          ...session.storyProgress,
-          currentCheckpoint: (session.storyProgress?.currentCheckpoint || 0) + 1,
-          completedChoices: [...(session.storyProgress?.completedChoices || []), choice]
-        }
-      };
-      onSessionUpdate(updatedSession);
+        setStorySegments(prev => [...prev, fallbackSegment]);
+        setVisibleSegments(prev => prev + 1);
+        
+        // Generate fallback choices
+        setTimeout(() => {
+          setCurrentChoices(generateFallbackChoices());
+          setShowChoices(true);
+        }, 2000);
+      }
     }, 1000);
   };
 
   const getCurrentCharacterName = () => {
-    // Mock character name - in real implementation, get from movie data
-    return 'Harry Potter';
+    return currentPlayer.characterName || currentPlayer.name || 'Unknown Character';
   };
 
   const getNextPlayer = () => {
@@ -202,39 +290,96 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
-  const generateMockImage = (choice) => {
-    // Use images from steering directory as per requirement
-    const steeringImages = [
-      '/.kiro/steering/Image generation art style/pixel eg.png',
-      '/.kiro/steering/Image generation art style/pixel eg2.png',
-      '/.kiro/steering/Image generation art style/pixel eg3.png',
-      '/.kiro/steering/Image generation art style/stranger things.png',
-      '/.kiro/steering/Image generation art style/Code_Generated_Image.png'
+  const getRandomArtStyleImage = () => {
+    // Use images from steering/artStyle directory as per requirements
+    const artStyleImages = [
+      '/artStyle/pixel1.png',
+      '/artStyle/pixel2.png',
+      '/artStyle/pixel3.png',
+      '/artStyle/pixel4.png',
+      '/artStyle/Code_Generated_Image.png',
+      '/artStyle/artStyle.png'
     ];
-    return steeringImages[Math.floor(Math.random() * steeringImages.length)];
+    return artStyleImages[Math.floor(Math.random() * artStyleImages.length)];
   };
 
-  const generateNewChoices = () => {
-    const choiceSets = [
-      [
-        { id: 'choice-a1', text: 'Follow the mysterious corridor to the left', impact: 'Discover hidden secrets' },
-        { id: 'choice-a2', text: 'Join the other students in the common room', impact: 'Build friendships' },
-        { id: 'choice-a3', text: 'Seek out Professor Dumbledore for guidance', impact: 'Gain wisdom' }
+  const generateFallbackChoices = () => {
+    const characterName = currentPlayer.characterName || 'Unknown Character';
+    
+    const characterChoices = {
+      'Harry Potter': [
+        { 
+          id: 'fallback-1', 
+          text: 'I cast "Expelliarmus" at the nearest magical threat while backing toward safety', 
+          reasoning: 'Harry\'s signature disarming spell and defensive instincts'
+        },
+        { 
+          id: 'fallback-2', 
+          text: 'I pull out my Invisibility Cloak and hide behind the stone gargoyle', 
+          reasoning: 'Harry\'s strategic use of inherited magical items for concealment'
+        },
+        { 
+          id: 'fallback-3', 
+          text: 'I whisper "Lumos Maxima" to illuminate the dark corners and reveal hidden details', 
+          reasoning: 'Harry\'s curiosity drives him to uncover magical mysteries'
+        }
       ],
-      [
-        { id: 'choice-b1', text: 'Practice magic spells in secret', impact: 'Develop hidden talents' },
-        { id: 'choice-b2', text: 'Investigate the strange noises from the dungeon', impact: 'Uncover mysteries' },
-        { id: 'choice-b3', text: 'Write a letter to your family about the changes', impact: 'Maintain connections' }
+      'Hermione Granger': [
+        { 
+          id: 'fallback-1', 
+          text: 'I cast "Protego Totalum" while searching my bag for relevant magical texts', 
+          reasoning: 'Hermione\'s defensive expertise combined with scholarly preparation'
+        },
+        { 
+          id: 'fallback-2', 
+          text: 'I examine the magical symbols etched into the ancient stonework with my wand', 
+          reasoning: 'Hermione\'s methodical approach to deciphering magical inscriptions'
+        },
+        { 
+          id: 'fallback-3', 
+          text: 'I cast "Revelio Maxima" to detect any hidden magical enchantments or objects', 
+          reasoning: 'Hermione\'s thorough investigation skills and advanced spell knowledge'
+        }
       ],
-      [
-        { id: 'choice-c1', text: 'Challenge the established rules of the school', impact: 'Revolutionary thinking' },
-        { id: 'choice-c2', text: 'Form an alliance with unexpected characters', impact: 'Surprising partnerships' },
-        { id: 'choice-c3', text: 'Discover a hidden room in the castle', impact: 'Unlock ancient secrets' }
+      'Ron Weasley': [
+        { 
+          id: 'fallback-1', 
+          text: 'I grab my Chocolate Frog cards and throw them to test for magical traps ahead', 
+          reasoning: 'Ron\'s practical problem-solving using available resources'
+        },
+        { 
+          id: 'fallback-2', 
+          text: 'I shout "Oi! Anyone there?" while raising my wand defensively', 
+          reasoning: 'Ron\'s direct confrontational approach to unknown situations'
+        },
+        { 
+          id: 'fallback-3', 
+          text: 'I use the Deluminator to extinguish the torches and create tactical darkness', 
+          reasoning: 'Ron\'s strategic use of inherited magical items in dangerous situations'
+        }
       ]
+    };
+    
+    const defaultChoices = [
+      { 
+        id: 'fallback-1', 
+        text: 'I cast "Alohomora" on the ornate door with the brass serpent handle', 
+        reasoning: 'Unlocking spells are essential for accessing restricted magical areas'
+      },
+      { 
+        id: 'fallback-2', 
+        text: 'I approach the portrait of Sir Cadogan and ask about recent magical disturbances', 
+        reasoning: 'Magical portraits are excellent sources of castle intelligence'
+      },
+      { 
+        id: 'fallback-3', 
+        text: 'I trace the glowing runes on the wall with my wand tip to activate their magic', 
+        reasoning: 'Ancient magical inscriptions often respond to direct magical contact'
+      }
     ];
     
-    const randomSet = choiceSets[Math.floor(Math.random() * choiceSets.length)];
-    return randomSet;
+    const choices = characterChoices[characterName] || defaultChoices;
+    return choices.map(choice => ({ ...choice, character: characterName, fallback: true }));
   };
 
   const formatTime = (seconds) => {
@@ -244,6 +389,134 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
   };
 
   const currentTurnPlayer = session.players?.find(p => p.id === session.currentTurn);
+
+  // Story completion screen
+  if (session.state === 'completed') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
+        {/* Background effects */}
+        <div 
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+              radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 40% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 30%)
+            `
+          }}
+        />
+        
+        <Container className="py-8 relative z-10">
+          <motion.div 
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Completion Header */}
+            <div className="text-center mb-12">
+              <motion.div
+                className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center"
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </motion.div>
+              
+              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+                Story Complete!
+              </h1>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                You've successfully created a unique version of {session.movieTitle} as {currentPlayer.characterName}
+              </p>
+            </div>
+
+            {/* Story Summary */}
+            <motion.div 
+              className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">Your Unique Story</h2>
+              
+              {session.conclusion && (
+                <div className="prose prose-lg prose-invert max-w-none mb-6">
+                  <p className="text-gray-200 leading-relaxed">
+                    {session.conclusion}
+                  </p>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-amber-400 mb-2">
+                    {session.storyState?.turnCount || storySegments.length}
+                  </div>
+                  <div className="text-gray-400">Choices Made</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-400 mb-2">
+                    {currentPlayer.characterName}
+                  </div>
+                  <div className="text-gray-400">Character Played</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-400 mb-2">
+                    {session.storyState?.segments?.length || Math.floor(storySegments.length / 2)}
+                  </div>
+                  <div className="text-gray-400">Story Segments</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Action Buttons */}
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              {isSoloMode && onBack && (
+                <Button onClick={onBack} size="lg">
+                  Play Another Story
+                </Button>
+              )}
+              <Button 
+                variant="secondary" 
+                onClick={() => window.location.href = '/'} 
+                size="lg"
+              >
+                Back to Home
+              </Button>
+              {session.storyState?.alternateScript && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    // Could open a modal or new page with the alternate script
+                    console.log('Alternate Script:', session.storyState.alternateScript);
+                    alert('Alternate script logged to console');
+                  }}
+                  size="lg"
+                >
+                  View Alternate Script
+                </Button>
+              )}
+            </motion.div>
+          </motion.div>
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
@@ -340,6 +613,27 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
       <Container className="py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
+          {/* Back button for solo mode */}
+          {isSoloMode && onBack && (
+            <motion.div 
+              className="flex justify-start mb-6"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Button 
+                variant="outline" 
+                onClick={onBack}
+                className="flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Movies
+              </Button>
+            </motion.div>
+          )}
+          
           <motion.h1 
             className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-wide"
             initial={{ opacity: 0, y: -20 }}
@@ -354,9 +648,17 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <span className="bg-gray-800/50 px-3 py-1 rounded-full">Room: {session.roomCode}</span>
+            <span className="bg-gray-800/50 px-3 py-1 rounded-full">
+              {isSoloMode || session.isSoloMode ? 'Solo Mode' : `Room: ${session.roomCode}`}
+            </span>
             <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
             <span className="bg-gray-800/50 px-3 py-1 rounded-full">Chapter {Math.floor(storySegments.length / 2) + 1}</span>
+            {currentPlayer.characterName && (
+              <>
+                <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
+                <span className="bg-purple-800/50 px-3 py-1 rounded-full">Playing as {currentPlayer.characterName}</span>
+              </>
+            )}
           </motion.div>
         </div>
 
@@ -506,7 +808,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
                     {segment.image && !segment.isBaseContent && (
                       <motion.div 
                         className={`xl:col-span-5 ${
-                          index % 2 === 0 ? 'xl:order-2' : 'xl:order-1'
+                          Math.floor((storySegments.filter((s, i) => i <= index && s.type === 'narrative' && !s.isBaseContent).length - 1) / 1) % 2 === 0 ? 'xl:order-2' : 'xl:order-1'
                         }`}
                         initial={{ 
                           opacity: 0, 
@@ -542,15 +844,16 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
                               alt="Story scene"
                               className="w-full h-72 xl:h-80 object-cover"
                               onError={(e) => {
-                                // Use images from steering directory as per requirements
-                                const steeringImages = [
-                                  '/.kiro/steering/Image generation art style/pixel eg.png',
-                                  '/.kiro/steering/Image generation art style/pixel eg2.png',
-                                  '/.kiro/steering/Image generation art style/pixel eg3.png',
-                                  '/.kiro/steering/Image generation art style/stranger things.png',
-                                  '/.kiro/steering/Image generation art style/Code_Generated_Image.png'
+                                // Use images from artStyle directory as per requirements
+                                const artStyleImages = [
+                                  '/artStyle/pixel1.png',
+                                  '/artStyle/pixel2.png',
+                                  '/artStyle/pixel3.png',
+                                  '/artStyle/pixel4.png',
+                                  '/artStyle/Code_Generated_Image.png',
+                                  '/artStyle/artStyle.png'
                                 ];
-                                e.target.src = steeringImages[index % steeringImages.length];
+                                e.target.src = artStyleImages[index % artStyleImages.length];
                               }}
                             />
                             
@@ -610,7 +913,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
                               alt="Story opening scene"
                               className="w-full h-80 object-cover"
                               onError={(e) => {
-                                e.target.src = '/.kiro/steering/Image generation art style/pixel eg.png';
+                                e.target.src = '/artStyle/pixel1.png';
                               }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
@@ -623,7 +926,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
                     <motion.div 
                       className={`xl:col-span-7 ${
                         segment.isBaseContent ? 'xl:col-span-12 text-center' : 
-                        index % 2 === 0 ? 'xl:order-1' : 'xl:order-2'
+                        Math.floor((storySegments.filter((s, i) => i <= index && s.type === 'narrative' && !s.isBaseContent).length - 1) / 1) % 2 === 0 ? 'xl:order-1' : 'xl:order-2'
                       }`}
                       initial={{ 
                         opacity: 0, 
@@ -918,7 +1221,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate }) => {
                                 </div>
                                 <div className="text-sm text-gray-400 flex items-center space-x-2">
                                   <div className="w-1 h-1 bg-amber-400 rounded-full"></div>
-                                  <span>Impact: {choice.impact}</span>
+                                  <span>{choice.reasoning}</span>
                                 </div>
                               </motion.div>
                               

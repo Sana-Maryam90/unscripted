@@ -53,13 +53,7 @@ const Header = () => {
             >
               🎭 Movies
             </Link>
-            <Link 
-              href="/test-chat" 
-              className="text-blue-600 hover:text-blue-800 transition-colors duration-200 font-semibold px-3 py-2 rounded-2xl hover:bg-blue-100"
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              💬 Test Chat
-            </Link>
+
           </nav>
 
           {/* CTA Button - Gaming Style */}

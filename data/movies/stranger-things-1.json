@@ -129,6 +129,23 @@
       }
     }
   ],
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Will's Disappearance",
+      "context": "Will Byers goes missing after a D&D campaign. The boys discover Will is missing and must decide how to search for their friend while adults dismiss their concerns."
+    },
+    {
+      "id": 2,
+      "title": "The Upside Down Discovery",
+      "context": "The group learns about the alternate dimension. Eleven reveals the existence of the Upside Down and the group must decide how to use this knowledge."
+    },
+    {
+      "id": 3,
+      "title": "Confronting the Demogorgon",
+      "context": "The final confrontation with the monster from the Upside Down. The Demogorgon has found the group and they must work together to survive and save Will."
+    }
+  ],
   "baseScript": "In the small town of Hawkins, Indiana, a young boy named Will Byers disappears under mysterious circumstances...",
   "themes": ["friendship", "family", "growing up", "government conspiracy", "supernatural horror"],
   "difficulty": "advanced",

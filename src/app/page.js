@@ -121,16 +121,20 @@ export default async function Home() {
               </p>
               
               {/* Fun Game-style CTA buttons */}
-              {/* Fun Game-style CTA buttons */}
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
                 <Link href="/quiz-game">
                   <Button size="xl" variant="primary" className="w-full sm:w-auto hover:animate-bounce-soft">
-                    🚀 START ADVENTURE
+                    🚀 QUIZ GAME
+                  </Button>
+                </Link>
+                <Link href="/buzzer-quiz">
+                  <Button size="xl" className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-400 hover:to-red-400 text-white font-bold hover:animate-pulse">
+                    🚨 BUZZER QUIZ
                   </Button>
                 </Link>
                 <Link href="/single-player">
                   <Button variant="secondary" size="xl" className="w-full sm:w-auto hover:animate-wobble">
-                    🎯 SOLO MISSION
+                    🎯 SOLO PLAY
                   </Button>
                 </Link>
               </div>
@@ -321,10 +325,15 @@ export default async function Home() {
               >
                 Join thousands of storytellers creating incredible movie experiences every day! The adventure awaits! ✨
               </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/quiz-game">
                   <Button size="lg" variant="primary" className="w-full sm:w-auto animate-bounce-soft">
-                    🚀 START PLAYING NOW
+                    🚀 QUIZ GAME
+                  </Button>
+                </Link>
+                <Link href="/buzzer-quiz">
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-400 hover:to-red-400 text-white font-bold">
+                    🚨 BUZZER QUIZ
                   </Button>
                 </Link>
                 <Link href="/join">

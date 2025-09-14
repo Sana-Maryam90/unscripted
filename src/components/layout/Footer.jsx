@@ -11,7 +11,7 @@ const Footer = () => {
       
       <Container>
         <div className="py-12 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Brand - Gaming Style */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
@@ -109,6 +109,45 @@ const Footer = () => {
                     style={{ fontFamily: 'Poppins, sans-serif' }}
                   >
                     🎪 Join Game
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Support - Help Section */}
+            <div>
+              <h3 
+                className="text-purple-900 font-bold mb-4 text-lg"
+                style={{ fontFamily: 'Fredoka, sans-serif' }}
+              >
+                🛠️ Support
+              </h3>
+              <ul className="space-y-3">
+                <li>
+                  <Link 
+                    href="/help" 
+                    className="text-purple-700 hover:text-purple-900 text-sm transition-colors duration-200 hover:underline font-medium"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    ❓ Help & FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/contact" 
+                    className="text-purple-700 hover:text-purple-900 text-sm transition-colors duration-200 hover:underline font-medium"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    📧 Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/feedback" 
+                    className="text-purple-700 hover:text-purple-900 text-sm transition-colors duration-200 hover:underline font-medium"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    💬 Feedback
                   </Link>
                 </li>
               </ul>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import TurnBasedQuizRoom from '../../components/game/TurnBasedQuizRoom';
+import BuzzerQuizRoom from '../../components/game/BuzzerQuizRoom';
 import Button from '../../components/ui/Button';
 import { getMovieByIdClient } from '../../lib/moviesClient';
 
@@ -11,7 +11,7 @@ const availableMovies = [
     {
         id: 'harry-potter-1',
         title: 'Harry Potter and the Philosopher\'s Stone',
-        description: 'Test your knowledge about the wizarding world'
+        description: 'Test your deep knowledge about the wizarding world'
     },
     {
         id: 'star-wars-4',
@@ -35,7 +35,7 @@ const availableMovies = [
     }
 ];
 
-function QuizGameContent() {
+function BuzzerQuizContent() {
     const [roomCode, setRoomCode] = useState('');
     const [playerName, setPlayerName] = useState('');
     const [playerId, setPlayerId] = useState('');
@@ -120,7 +120,7 @@ function QuizGameContent() {
         }
 
         localStorage.setItem('playerName', playerName);
-        // For joining, character selection will be handled in TurnBasedQuizRoom
+        // For joining, character selection will be handled in BuzzerQuizRoom
         // if the room has a movie selected
         setIsInRoom(true);
     };
@@ -149,7 +149,7 @@ function QuizGameContent() {
 
     if (isInRoom && roomCode && playerId && playerName) {
         return (
-            <TurnBasedQuizRoom
+            <BuzzerQuizRoom
                 roomCode={roomCode}
                 playerId={playerId}
                 playerName={playerName}
@@ -176,13 +176,16 @@ function QuizGameContent() {
                     <div className="glass-card p-8 w-full max-w-4xl">
                         <div className="text-center mb-8">
                             <h1 className="text-4xl font-bold text-cream mb-2 font-display">
-                                Choose Your Character
+                                🚨 Choose Your Character
                             </h1>
                             <p className="text-cream/70 mb-4">
-                                Select a character from <strong>{movieData.title}</strong> to play as in the quiz
+                                Select a character from <strong>{movieData.title}</strong> to play as in the buzzer quiz
                             </p>
-                            <p className="text-sm text-cream/50">
+                            <p className="text-sm text-cream/50 mb-2">
                                 Your character name will be your username in the quiz room
+                            </p>
+                            <p className="text-yellow-400 text-sm font-medium">
+                                🚨 First come, first serve! Press the buzzer to answer questions!
                             </p>
                         </div>
 
@@ -191,15 +194,15 @@ function QuizGameContent() {
                                 <div
                                     key={character.id}
                                     onClick={() => selectCharacter(character)}
-                                    className="p-6 rounded-lg border-2 border-cream/20 bg-cream/5 hover:border-primary-400 hover:bg-primary-500/10 cursor-pointer transition-all group glass-card"
+                                    className="p-6 rounded-lg border-2 border-cream/20 bg-cream/5 hover:border-yellow-400 hover:bg-yellow-500/10 cursor-pointer transition-all group glass-card"
                                 >
                                     <div className="text-center">
-                                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary-500 to-primary-400 rounded-full flex items-center justify-center">
+                                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-500 to-red-500 rounded-full flex items-center justify-center">
                                             <span className="text-2xl font-bold text-cream">
                                                 {character.name.charAt(0)}
                                             </span>
                                         </div>
-                                        <h3 className="text-cream font-semibold mb-2 group-hover:text-primary-300 font-display">
+                                        <h3 className="text-cream font-semibold mb-2 group-hover:text-yellow-300 font-display">
                                             {character.name}
                                         </h3>
                                         <p className="text-cream/70 text-sm mb-3 line-clamp-2">
@@ -231,20 +234,26 @@ function QuizGameContent() {
         <div className="min-h-screen bg-gradient-to-br from-slate-darker via-slate-dark to-dark-900">
             {/* Artistic Background */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-blob"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cream rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
-                <div className="absolute top-40 left-40 w-80 h-80 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-12 animate-blob animation-delay-4000"></div>
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-500 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-blob"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
+                <div className="absolute top-40 left-40 w-80 h-80 bg-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-12 animate-blob animation-delay-4000"></div>
             </div>
 
             <div className="relative min-h-screen flex items-center justify-center p-4">
                 <div className="glass-card p-8 w-full max-w-4xl">
                     <div className="text-center mb-8">
                         <h1 className="text-4xl font-bold text-cream mb-2 font-display">
-                            Turn-Based Movie Quiz
+                            🚨 Buzzer Quiz Game
                         </h1>
-                        <p className="text-cream/70">
-                            Create or join a room to play a multiplayer movie quiz game
+                        <p className="text-cream/70 mb-4">
+                            First come, first serve! Press the buzzer to answer detailed movie questions
                         </p>
+                        <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-4">
+                            <p className="text-yellow-300 text-sm">
+                                <strong>🚨 How it works:</strong> When a question appears, press the buzzer to get control. 
+                                You have 2 seconds to answer once you buzz in!
+                            </p>
+                        </div>
                     </div>
 
                     {!showJoinForm ? (
@@ -259,13 +268,13 @@ function QuizGameContent() {
                                     value={playerName}
                                     onChange={(e) => setPlayerName(e.target.value)}
                                     placeholder="Enter your name"
-                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-primary-500"
+                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-yellow-500"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-cream/80 mb-4">
-                                    Select a Movie
+                                    Select a Movie (20 detailed questions will be generated)
                                 </label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {availableMovies.map((movie) => (
@@ -273,15 +282,15 @@ function QuizGameContent() {
                                             key={movie.id}
                                             onClick={() => setSelectedMovie(movie)}
                                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all glass-card ${selectedMovie?.id === movie.id
-                                                ? 'border-primary-500 bg-primary-500/20'
-                                                : 'border-cream/20 bg-cream/5 hover:border-primary-400'
+                                                ? 'border-yellow-500 bg-yellow-500/20'
+                                                : 'border-cream/20 bg-cream/5 hover:border-yellow-400'
                                                 }`}
                                         >
                                             <h3 className="text-cream font-semibold mb-2 font-display">{movie.title}</h3>
                                             <p className="text-cream/70 text-sm">{movie.description}</p>
                                             {selectedMovie?.id === movie.id && (
                                                 <div className="mt-2">
-                                                    <span className="text-xs bg-primary-500 text-cream px-2 py-1 rounded">
+                                                    <span className="text-xs bg-yellow-500 text-cream px-2 py-1 rounded">
                                                         Selected
                                                     </span>
                                                 </div>
@@ -295,9 +304,9 @@ function QuizGameContent() {
                                 <Button
                                     onClick={createRoom}
                                     disabled={!playerName.trim() || !selectedMovie || isCreating}
-                                    className="flex-1 modern-button"
+                                    className="flex-1 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-400 hover:to-red-400 text-white font-bold"
                                 >
-                                    {isCreating ? 'Creating Room...' : 'Create Quiz Room'}
+                                    {isCreating ? 'Creating Room...' : '🚨 Create Buzzer Quiz Room'}
                                 </Button>
                                 <Button
                                     onClick={() => setShowJoinForm(true)}
@@ -320,7 +329,7 @@ function QuizGameContent() {
                                     value={playerName}
                                     onChange={(e) => setPlayerName(e.target.value)}
                                     placeholder="Enter your name"
-                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-primary-500"
+                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-yellow-500"
                                 />
                             </div>
 
@@ -333,7 +342,7 @@ function QuizGameContent() {
                                     value={roomCode}
                                     onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                                     placeholder="Enter 6-character room code"
-                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-primary-500 font-mono text-center text-lg tracking-widest"
+                                    className="w-full bg-cream/10 border border-cream/30 rounded-lg px-4 py-2 text-cream placeholder-cream/50 focus:outline-none focus:border-yellow-500 font-mono text-center text-lg tracking-widest"
                                     maxLength={6}
                                 />
                             </div>
@@ -342,9 +351,9 @@ function QuizGameContent() {
                                 <Button
                                     onClick={joinRoom}
                                     disabled={!playerName.trim() || !roomCode.trim()}
-                                    className="flex-1 modern-button"
+                                    className="flex-1 bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-400 hover:to-red-400 text-white font-bold"
                                 >
-                                    Join Quiz Room
+                                    🚨 Join Buzzer Quiz Room
                                 </Button>
                                 <Button
                                     onClick={() => setShowJoinForm(false)}
@@ -363,7 +372,7 @@ function QuizGameContent() {
                         </p>
                         <button
                             onClick={() => router.push('/')}
-                            className="text-primary-400 hover:text-primary-300 text-sm"
+                            className="text-yellow-400 hover:text-yellow-300 text-sm"
                         >
                             ← Back to Home
                         </button>
@@ -374,10 +383,10 @@ function QuizGameContent() {
     );
 }
 
-export default function QuizGamePage() {
+export default function BuzzerQuizPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <QuizGameContent />
+            <BuzzerQuizContent />
         </Suspense>
     );
 }

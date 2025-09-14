@@ -129,6 +129,23 @@
       }
     }
   ],
+  "scenes": [
+    {
+      "id": 1,
+      "title": "The Hogwarts Letter",
+      "context": "Harry receives his Hogwarts letter on his 11th birthday. The Dursleys have taken Harry to a hut on a rock in the sea to escape the letters, but Hagrid arrives at midnight."
+    },
+    {
+      "id": 2,
+      "title": "Diagon Alley Shopping",
+      "context": "Harry visits Diagon Alley to buy his school supplies. Harry is overwhelmed by the magical world and must make choices about his purchases and interactions."
+    },
+    {
+      "id": 3,
+      "title": "The Sorting Hat",
+      "context": "Harry faces the Sorting Hat at Hogwarts. The Sorting Hat considers placing Harry in Slytherin, but Harry can influence this decision."
+    }
+  ],
   "baseScript": "The original story follows Harry Potter as he discovers he's a wizard and begins his education at Hogwarts School of Witchcraft and Wizardry...",
   "themes": ["friendship", "courage", "identity", "good vs evil", "belonging"],
   "difficulty": "beginner",

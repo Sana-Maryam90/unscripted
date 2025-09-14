@@ -121,6 +121,23 @@
       }
     }
   ],
+  "scenes": [
+    {
+      "id": 1,
+      "title": "First Day of Middle School",
+      "context": "Greg starts middle school with big plans for popularity. Greg enters middle school determined to become popular, but must navigate the complex social hierarchy."
+    },
+    {
+      "id": 2,
+      "title": "The Cheese Touch",
+      "context": "The infamous cheese appears on the basketball court. A moldy piece of cheese becomes the center of a school-wide game of avoidance, and Greg must decide how to handle it."
+    },
+    {
+      "id": 3,
+      "title": "The Safety Patrol Incident",
+      "context": "Greg and Rowley's friendship is tested during a safety patrol incident. A misunderstanding during safety patrol duty threatens to end Greg and Rowley's friendship."
+    }
+  ],
   "baseScript": "Greg Heffley is an ambitious kid with an active imagination and big plans to be rich and famous...",
   "themes": ["friendship", "growing up", "social pressure", "authenticity", "family"],
   "difficulty": "beginner",

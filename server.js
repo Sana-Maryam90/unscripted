@@ -14,6 +14,152 @@ const handle = app.getRequestHandler();
 // In-memory game sessions (replace with Redis in production)
 const gameSessions = new Map();
 
+/**
+ * Generates fallback questions when AI fails
+ * @param {string} movieId - The movie ID
+ * @param {Object} movieData - The movie data object
+ * @returns {Array} Array of fallback quiz questions
+ */
+function generateFallbackBuzzerQuestions(movieId, movieData) {
+    const movieTitle = movieData?.title || 'Unknown Movie';
+    
+    // Predefined detailed questions for Harry Potter
+    if (movieId === 'harry-potter-1') {
+        return [
+            {
+                id: 1,
+                question: "What is the exact address of the Dursleys' house on Privet Drive?",
+                options: ["Number 2", "Number 4", "Number 6", "Number 8"],
+                correct: 1
+            },
+            {
+                id: 2,
+                question: "What specific incantation does Hermione use to repair Harry's glasses on the Hogwarts Express?",
+                options: ["Reparo", "Oculus Reparo", "Episkey", "Vulnera Sanentur"],
+                correct: 1
+            },
+            {
+                id: 3,
+                question: "What is the name of the three-headed dog guarding the Philosopher's Stone?",
+                options: ["Cerberus", "Fluffy", "Fang", "Aragog"],
+                correct: 1
+            },
+            {
+                id: 4,
+                question: "Which specific Quidditch position does Oliver Wood play for Gryffindor?",
+                options: ["Seeker", "Chaser", "Beater", "Keeper"],
+                correct: 3
+            },
+            {
+                id: 5,
+                question: "What does Hagrid give Dudley when the Dursleys refuse to let Harry go to Hogwarts?",
+                options: ["A pig's tail", "Boils", "Purple hair", "Giant ears"],
+                correct: 0
+            },
+            {
+                id: 6,
+                question: "What is the password to get past the Fat Lady's portrait to enter Gryffindor Tower?",
+                options: ["Caput Draconis", "Pig Snout", "Wattlebird", "Fortuna Major"],
+                correct: 0
+            },
+            {
+                id: 7,
+                question: "What specific potion ingredient does Snape ask Harry about in his first Potions class?",
+                options: ["Bezoar", "Wolfsbane", "Monkshood", "Wormwood"],
+                correct: 0
+            },
+            {
+                id: 8,
+                question: "How many staircases are there at Hogwarts according to Hermione?",
+                options: ["142", "144", "146", "148"],
+                correct: 0
+            },
+            {
+                id: 9,
+                question: "What does Harry see when he looks in the Mirror of Erised?",
+                options: ["Himself as Head Boy", "His parents", "Himself holding the Quidditch Cup", "Voldemort defeated"],
+                correct: 1
+            },
+            {
+                id: 10,
+                question: "What is the first spell Harry successfully performs in Charms class?",
+                options: ["Lumos", "Alohomora", "Wingardium Leviosa", "Expelliarmus"],
+                correct: 2
+            },
+            {
+                id: 11,
+                question: "What does Dumbledore see when he looks in the Mirror of Erised?",
+                options: ["His family", "Himself holding thick woolen socks", "The defeat of Voldemort", "Grindelwald's redemption"],
+                correct: 1
+            },
+            {
+                id: 12,
+                question: "What is the name of Filch's cat?",
+                options: ["Mrs. Norris", "Mrs. Figg", "Crookshanks", "Minerva"],
+                correct: 0
+            },
+            {
+                id: 13,
+                question: "What does the Sorting Hat almost put Harry in before choosing Gryffindor?",
+                options: ["Ravenclaw", "Hufflepuff", "Slytherin", "It never hesitated"],
+                correct: 2
+            },
+            {
+                id: 14,
+                question: "What is the name of the dragon that guards the high-security vaults at Gringotts?",
+                options: ["Norwegian Ridgeback", "Hungarian Horntail", "Ukrainian Ironbelly", "Chinese Fireball"],
+                correct: 2
+            },
+            {
+                id: 15,
+                question: "What does Ron sacrifice in McGonagall's giant chess game?",
+                options: ["Himself as a pawn", "Himself as a knight", "Himself as a bishop", "Himself as a rook"],
+                correct: 1
+            },
+            {
+                id: 16,
+                question: "What is the exact riddle Snape creates to guard the Philosopher's Stone?",
+                options: ["A potion riddle with seven bottles", "A riddle about keys", "A riddle about mirrors", "A mathematical riddle"],
+                correct: 0
+            },
+            {
+                id: 17,
+                question: "What does Quirrell say when he tries to kill Harry in the final confrontation?",
+                options: ["Avada Kedavra", "Crucio", "Kill the boy", "Imperio"],
+                correct: 2
+            },
+            {
+                id: 18,
+                question: "How many points does Dumbledore award to Neville at the end-of-year feast?",
+                options: ["5 points", "10 points", "15 points", "20 points"],
+                correct: 1
+            },
+            {
+                id: 19,
+                question: "What is the name of the Potions textbook Harry uses in his first year?",
+                options: ["Magical Drafts and Potions", "Advanced Potion-Making", "One Thousand Magical Herbs and Fungi", "The Standard Book of Spells"],
+                correct: 0
+            },
+            {
+                id: 20,
+                question: "What does Hagrid name his dragon egg that hatches in his hut?",
+                options: ["Norbert", "Norberta", "Fluffy", "Fang"],
+                correct: 0
+            }
+        ];
+    }
+    
+    // Generic fallback questions for other movies
+    return Array.from({ length: 20 }, (_, i) => ({
+        id: i + 1,
+        question: `What is a specific detail about ${movieTitle} that requires deep knowledge of the film?`,
+        options: ["Option A", "Option B", "Option C", "Option D"],
+        correct: Math.floor(Math.random() * 4)
+    }));
+}
+
+
+
 app.prepare().then(() => {
     // Create HTTP server
     const httpServer = createServer(async (req, res) => {
@@ -105,26 +251,11 @@ app.prepare().then(() => {
             const roomId = `room_${roomCode}`;
             let session = gameSessions.get(roomId);
 
-            // If room doesn't exist, create it (for test chat)
+            // If room doesn't exist, return error (rooms should be created explicitly)
             if (!session) {
-                console.log(`🆕 Creating new room ${roomCode} for ${playerName}`);
-                session = {
-                    id: roomId,
-                    roomCode,
-                    movieId: null,
-                    mode: 'test-chat',
-                    state: 'waiting',
-                    players: [],
-                    messages: [],
-                    currentTurn: null,
-                    storyProgress: {
-                        currentCheckpoint: 0,
-                        completedChoices: [],
-                        generatedContent: []
-                    },
-                    createdAt: new Date()
-                };
-                gameSessions.set(roomId, session);
+                console.log(`❌ Room ${roomCode} not found`);
+                socket.emit('error', { message: 'Room not found. Please check the room code.' });
+                return;
             }
 
             if (session.players.length >= 4) {
@@ -244,8 +375,13 @@ app.prepare().then(() => {
                     );
                 }
 
-                // Notify all players
-                io.to(roomId).emit('session-updated', session);
+                // Notify all players based on room type
+                if (roomId.startsWith('buzzer_')) {
+                    io.to(roomId).emit('buzzer-session-updated', session);
+                } else {
+                    io.to(roomId).emit('session-updated', session);
+                }
+                
                 io.to(roomId).emit('character-selected', {
                     playerId,
                     playerName: characterName,
@@ -706,6 +842,375 @@ app.prepare().then(() => {
             io.to(roomId).emit('session-updated', session);
 
             console.log(`🔄 Quiz reset in room ${session.roomCode}`);
+        });
+
+        // Handle buzzer quiz room joining
+        socket.on('join-buzzer-room', (data) => {
+            console.log('🚨 Join buzzer room request:', data);
+            const { roomCode, playerId, playerName, movieId, characterId } = data;
+
+            const roomId = `buzzer_${roomCode}`;
+            let session = gameSessions.get(roomId);
+
+            // Create room if it doesn't exist
+            if (!session) {
+                console.log(`🆕 Creating new buzzer room ${roomCode} for ${playerName}`);
+                session = {
+                    id: roomId,
+                    roomCode,
+                    movieId: movieId || null,
+                    mode: 'buzzer-quiz',
+                    state: 'waiting',
+                    gameState: 'waiting',
+                    players: [],
+                    messages: [],
+                    questions: [],
+                    currentQuestion: null,
+                    currentQuestionIndex: 0,
+                    questionNumber: 0,
+                    activeBuzzer: null,
+                    canBuzz: false,
+                    timeLeft: 0,
+                    scores: {},
+                    wrongAnswers: {},
+                    showAnswer: false,
+                    totalQuestions: 20,
+                    movieData: null,
+                    availableCharacters: [],
+                    createdAt: new Date()
+                };
+                gameSessions.set(roomId, session);
+            }
+
+            if (session.players.length >= 4) {
+                socket.emit('error', { message: 'Room is full' });
+                return;
+            }
+
+            // Check if player already exists (reconnection)
+            const existingPlayer = session.players.find(p => p.id === playerId);
+            if (existingPlayer) {
+                existingPlayer.socketId = socket.id;
+                existingPlayer.status = 'online';
+                activeConnections.set(socket.id, { playerId, roomId });
+                socket.join(roomId);
+                socket.emit('buzzer-room-joined', {
+                    roomCode,
+                    playerId,
+                    player: existingPlayer,
+                    room: session
+                });
+                socket.to(roomId).emit('buzzer-session-updated', session);
+                console.log(`🔄 ${playerName} reconnected to buzzer room ${roomCode}`);
+                return;
+            }
+
+            // Add new player
+            const newPlayer = {
+                id: playerId,
+                name: playerName,
+                socketId: socket.id,
+                isHost: session.players.length === 0,
+                status: 'online',
+                characterId: characterId || null,
+                joinedAt: new Date()
+            };
+
+            session.players.push(newPlayer);
+            activeConnections.set(socket.id, { playerId, roomId });
+            socket.join(roomId);
+
+            // Load movie data if provided
+            if (movieId && !session.movieData) {
+                try {
+                    const fs = require('fs');
+                    const path = require('path');
+                    const moviePath = path.join(process.cwd(), 'data', 'movies', `${movieId}.json`);
+                    const movieData = JSON.parse(fs.readFileSync(moviePath, 'utf8'));
+                    session.movieData = movieData;
+                    session.availableCharacters = movieData.characters.filter(c => 
+                        !session.players.some(p => p.characterId === c.id)
+                    );
+                } catch (error) {
+                    console.error('Error loading movie data:', error);
+                }
+            }
+
+            // Notify all players
+            socket.to(roomId).emit('player-joined', {
+                player: newPlayer,
+                room: session
+            });
+
+            socket.emit('buzzer-room-joined', {
+                roomCode,
+                playerId,
+                player: newPlayer,
+                room: session
+            });
+
+            console.log(`✅ ${playerName} joined buzzer room ${roomCode}`);
+        });
+
+        // Handle buzzer quiz start
+        socket.on('start-buzzer-quiz', async () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) {
+                socket.emit('error', { message: 'Only the host can start the buzzer quiz' });
+                return;
+            }
+
+            if (session.players.length < 2) {
+                socket.emit('error', { message: 'Need at least 2 players to start buzzer quiz' });
+                return;
+            }
+
+            try {
+                // Generate 20 detailed questions using AI
+                const { generateBuzzerQuizQuestions } = require('./src/lib/gemini.js');
+                let questions;
+                
+                try {
+                    questions = await generateBuzzerQuizQuestions(session.movieId, session.movieData);
+                } catch (aiError) {
+                    console.warn('AI question generation failed, using fallback questions:', aiError.message);
+                    questions = generateFallbackBuzzerQuestions(session.movieId, session.movieData);
+                }
+                
+                session.gameState = 'playing';
+                session.questions = questions;
+                session.currentQuestionIndex = 0;
+                session.currentQuestion = questions[0];
+                session.questionNumber = 1;
+                session.activeBuzzer = null;
+                session.canBuzz = true;
+                session.timeLeft = 0;
+                session.showAnswer = false;
+                session.scores = {};
+
+                // Initialize scores
+                session.players.forEach(p => {
+                    session.scores[p.id] = 0;
+                });
+
+                // Notify all players
+                io.to(roomId).emit('buzzer-quiz-started', {
+                    question: session.currentQuestion,
+                    questionNumber: session.questionNumber,
+                    totalQuestions: session.totalQuestions,
+                    movieTitle: session.movieData?.title || 'Unknown Movie'
+                });
+
+                console.log(`🚨 Buzzer quiz started in room ${session.roomCode} with ${questions.length} questions`);
+            } catch (error) {
+                console.error('Error starting buzzer quiz:', error);
+                socket.emit('error', { message: 'Failed to generate quiz questions. Please try again.' });
+            }
+        });
+
+        // Handle buzzer press
+        socket.on('press-buzzer', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session || session.gameState !== 'playing') return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !session.canBuzz || session.activeBuzzer) return;
+
+            // Player gets control
+            session.activeBuzzer = playerId;
+            session.canBuzz = false;
+            session.timeLeft = 2; // 2 seconds to answer
+
+            // Start countdown timer
+            const countdownTimer = setInterval(() => {
+                session.timeLeft--;
+                
+                if (session.timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    
+                    // Time's up - release control
+                    session.activeBuzzer = null;
+                    session.canBuzz = true;
+                    session.timeLeft = 0;
+
+                    io.to(roomId).emit('buzzer-timeout', {
+                        playerId,
+                        playerName: player.name
+                    });
+
+                    io.to(roomId).emit('buzzer-session-updated', session);
+                }
+            }, 1000);
+
+            // Store timer reference for cleanup
+            session.countdownTimer = countdownTimer;
+
+            io.to(roomId).emit('buzzer-pressed', {
+                playerId,
+                playerName: player.name
+            });
+
+            io.to(roomId).emit('buzzer-session-updated', session);
+
+            console.log(`🚨 ${player.name} pressed buzzer in room ${session.roomCode}`);
+        });
+
+        // Handle buzzer answer submission
+        socket.on('submit-buzzer-answer', (data) => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session || session.gameState !== 'playing') return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || session.activeBuzzer !== playerId) return;
+
+            const { selectedAnswer } = data;
+            const question = session.currentQuestion;
+            const isCorrect = selectedAnswer === question.correct;
+
+            // Clear countdown timer
+            if (session.countdownTimer) {
+                clearInterval(session.countdownTimer);
+                session.countdownTimer = null;
+            }
+
+            // Update score and wrong answers
+            if (isCorrect) {
+                session.scores[playerId] = (session.scores[playerId] || 0) + 1;
+            } else {
+                // Track wrong answers for cut marks
+                if (!session.wrongAnswers) {
+                    session.wrongAnswers = {};
+                }
+                session.wrongAnswers[playerId] = (session.wrongAnswers[playerId] || 0) + 1;
+            }
+
+            session.showAnswer = true;
+            session.activeBuzzer = null;
+            session.canBuzz = false;
+            session.timeLeft = 0;
+
+            // Notify all players
+            io.to(roomId).emit('buzzer-answer-submitted', {
+                playerId,
+                playerName: player.name,
+                selectedAnswer,
+                correctAnswer: question.correct,
+                answerText: question.options[selectedAnswer],
+                correctAnswerText: question.options[question.correct],
+                isCorrect,
+                scores: session.scores
+            });
+
+            console.log(`📝 ${player.name} answered buzzer question ${session.questionNumber}: ${isCorrect ? 'correct' : 'wrong'}`);
+        });
+
+        // Handle buzzer next question
+        socket.on('buzzer-next-question', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session || session.gameState !== 'playing') return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) return;
+
+            session.currentQuestionIndex++;
+
+            // Check if quiz is finished
+            if (session.currentQuestionIndex >= session.questions.length) {
+                // Find winner
+                let maxScore = -1;
+                let winner = null;
+
+                session.players.forEach(p => {
+                    const score = session.scores[p.id] || 0;
+                    if (score > maxScore) {
+                        maxScore = score;
+                        winner = { name: p.name, score };
+                    }
+                });
+
+                session.gameState = 'finished';
+                session.activeBuzzer = null;
+                session.canBuzz = false;
+
+                io.to(roomId).emit('buzzer-quiz-finished', {
+                    scores: session.scores,
+                    winner
+                });
+
+                console.log(`🏁 Buzzer quiz finished in room ${session.roomCode}. Winner: ${winner.name}`);
+                return;
+            }
+
+            // Move to next question
+            session.currentQuestion = session.questions[session.currentQuestionIndex];
+            session.questionNumber = session.currentQuestionIndex + 1;
+            session.showAnswer = false;
+            session.activeBuzzer = null;
+            session.canBuzz = true;
+            session.timeLeft = 0;
+
+            io.to(roomId).emit('buzzer-next-question', {
+                question: session.currentQuestion,
+                questionNumber: session.questionNumber,
+                totalQuestions: session.totalQuestions
+            });
+
+            console.log(`➡️ Next buzzer question in room ${session.roomCode}: Q${session.questionNumber}`);
+        });
+
+        // Handle buzzer quiz reset
+        socket.on('reset-buzzer-quiz', () => {
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { playerId, roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.id === playerId);
+            if (!player || !player.isHost) return;
+
+            // Clear any active timers
+            if (session.countdownTimer) {
+                clearInterval(session.countdownTimer);
+                session.countdownTimer = null;
+            }
+
+            // Reset quiz state
+            session.gameState = 'waiting';
+            session.questions = [];
+            session.currentQuestion = null;
+            session.currentQuestionIndex = 0;
+            session.questionNumber = 0;
+            session.activeBuzzer = null;
+            session.canBuzz = false;
+            session.timeLeft = 0;
+            session.scores = {};
+            session.wrongAnswers = {};
+            session.showAnswer = false;
+
+            io.to(roomId).emit('buzzer-session-updated', session);
+
+            console.log(`🔄 Buzzer quiz reset in room ${session.roomCode}`);
         });
 
         // Handle player status updates

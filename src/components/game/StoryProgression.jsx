@@ -131,17 +131,17 @@ const StoryProgression = ({ session, currentPlayer, onSessionUpdate }) => {
       {
         id: 'choice-a',
         text: 'Take the cautious approach',
-        impact: 'careful consideration'
+        reasoning: 'careful consideration'
       },
       {
         id: 'choice-b', 
         text: 'Act boldly and decisively',
-        impact: 'brave action'
+        reasoning: 'brave action'
       },
       {
         id: 'choice-c',
         text: 'Try to find a creative solution',
-        impact: 'innovative thinking'
+        reasoning: 'innovative thinking'
       }
     ];
   };
@@ -263,7 +263,7 @@ const StoryProgression = ({ session, currentPlayer, onSessionUpdate }) => {
                             {String.fromCharCode(65 + index)}. {choice.text}
                           </div>
                           <div className="text-sm text-gray-400">
-                            Impact: {choice.impact}
+                            {choice.reasoning}
                           </div>
                         </div>
                       </Button>

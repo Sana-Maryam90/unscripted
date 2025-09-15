@@ -55,30 +55,30 @@ export default async function Home() {
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Floating Design Assets - Artistically placed */}
         <div className="absolute top-20 left-16 w-16 h-16 animate-float opacity-60">
-          <img src="/images/designAssets/Group 14.png" alt="Game Element" className="w-full h-full object-contain" 
-               style={{filter: 'hue-rotate(20deg) saturate(1.2)'}} />
+          <img src="/images/designAssets/Group 14.png" alt="Game Element" className="w-full h-full object-contain"
+            style={{ filter: 'hue-rotate(20deg) saturate(1.2)' }} />
         </div>
-        <div className="absolute top-32 right-20 w-20 h-20 animate-float opacity-50" style={{animationDelay: '1s'}}>
+        <div className="absolute top-32 right-20 w-20 h-20 animate-float opacity-50" style={{ animationDelay: '1s' }}>
           <img src="/images/designAssets/Group 15.png" alt="Game Element" className="w-full h-full object-contain"
-               style={{filter: 'hue-rotate(280deg) saturate(1.1)'}} />
+            style={{ filter: 'hue-rotate(280deg) saturate(1.1)' }} />
         </div>
-        <div className="absolute bottom-32 left-20 w-24 h-24 animate-float opacity-40" style={{animationDelay: '2s'}}>
+        <div className="absolute bottom-32 left-20 w-24 h-24 animate-float opacity-40" style={{ animationDelay: '2s' }}>
           <img src="/images/designAssets/Group 16.png" alt="Game Element" className="w-full h-full object-contain"
-               style={{filter: 'hue-rotate(200deg) saturate(1.3)'}} />
+            style={{ filter: 'hue-rotate(200deg) saturate(1.3)' }} />
         </div>
         <div className="absolute bottom-20 right-16 w-18 h-18 animate-wobble opacity-50">
           <img src="/images/designAssets/Clip path group-2.png" alt="Game Element" className="w-full h-full object-contain"
-               style={{filter: 'hue-rotate(320deg) saturate(1.2)'}} />
+            style={{ filter: 'hue-rotate(320deg) saturate(1.2)' }} />
         </div>
-        <div className="absolute top-60 left-1/3 w-14 h-14 animate-bounce-soft opacity-45" style={{animationDelay: '0.5s'}}>
+        <div className="absolute top-60 left-1/3 w-14 h-14 animate-bounce-soft opacity-45" style={{ animationDelay: '0.5s' }}>
           <img src="/images/designAssets/Clip path group-3.png" alt="Game Element" className="w-full h-full object-contain"
-               style={{filter: 'hue-rotate(40deg) saturate(1.4)'}} />
+            style={{ filter: 'hue-rotate(40deg) saturate(1.4)' }} />
         </div>
-        <div className="absolute bottom-60 right-1/3 w-16 h-16 animate-float opacity-40" style={{animationDelay: '3s'}}>
+        <div className="absolute bottom-60 right-1/3 w-16 h-16 animate-float opacity-40" style={{ animationDelay: '3s' }}>
           <img src="/images/designAssets/Group 19.png" alt="Game Element" className="w-full h-full object-contain"
-               style={{filter: 'hue-rotate(160deg) saturate(1.1)'}} />
+            style={{ filter: 'hue-rotate(160deg) saturate(1.1)' }} />
         </div>
-        
+
         {/* Colorful geometric shapes with your palette */}
         <div className="absolute top-40 right-1/2 w-8 h-8 bg-pink/40 rounded-2xl transform rotate-45 animate-wobble"></div>
         <div className="absolute bottom-40 left-1/2 w-6 h-6 bg-blue/50 rounded-full animate-pulse-glow"></div>
@@ -97,13 +97,17 @@ export default async function Home() {
               {/* Gaming Title with ByteBounce Font */}
               <div className="mb-8">
                 <h1 className="mb-6">
-                  <span 
-                    className="block text-5xl sm:text-6xl lg:text-7xl text-dark leading-tight animate-pulse-slow"
-                    style={{ fontFamily: 'ByteBounce, monospace', textShadow: '3px 3px 0px rgba(245, 173, 196, 0.3)' }}
+                  <span
+                    className="block text-dark leading-tight animate-pulse-slow"
+                    style={{
+                      fontFamily: 'ByteBounce, monospace',
+                      textShadow: '3px 3px 0px rgba(245, 173, 196, 0.3)',
+                      fontSize: 'clamp(4rem, 15vw, 12rem)'
+                    }}
                   >
                     UNSCRIPTED
                   </span>
-                  <span 
+                  <span
                     className="block text-2xl sm:text-3xl lg:text-4xl text-purple mt-4 animate-float"
                     style={{ fontFamily: 'Fredoka, sans-serif' }}
                   >
@@ -111,15 +115,15 @@ export default async function Home() {
                   </span>
                 </h1>
               </div>
-              
+
               {/* Simplified description with cartoonish feel */}
-              <p 
+              <p
                 className="text-lg sm:text-xl text-purple-800 mb-10 max-w-2xl mx-auto leading-relaxed font-medium"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
                 🎬 Transform movies into interactive games! Choose your character, make decisions, and create amazing new stories with friends! 🎮✨
               </p>
-              
+
               {/* Fun Game-style CTA buttons */}
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
                 <Link href="/quiz-game">
@@ -135,6 +139,11 @@ export default async function Home() {
                 <Link href="/single-player">
                   <Button variant="secondary" size="xl" className="w-full sm:w-auto hover:animate-wobble">
                     🎯 SOLO PLAY
+                  </Button>
+                </Link>
+                <Link href="/multiplayer">
+                  <Button size="xl" className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold hover:animate-pulse">
+                    🎭 MULTIPLAYER STORY
                   </Button>
                 </Link>
               </div>
@@ -159,26 +168,26 @@ export default async function Home() {
           {/* Artistic floating elements for this section */}
           <div className="absolute top-10 left-10 w-12 h-12 animate-float opacity-50">
             <img src="/images/designAssets/Clip path group-4.png" alt="Decoration" className="w-full h-full object-contain"
-                 style={{filter: 'hue-rotate(60deg) saturate(1.3)'}} />
+              style={{ filter: 'hue-rotate(60deg) saturate(1.3)' }} />
           </div>
           <div className="absolute top-20 right-10 w-10 h-10 animate-wobble opacity-40">
             <img src="/images/designAssets/Clip path group-5.png" alt="Decoration" className="w-full h-full object-contain"
-                 style={{filter: 'hue-rotate(240deg) saturate(1.2)'}} />
+              style={{ filter: 'hue-rotate(240deg) saturate(1.2)' }} />
           </div>
           <div className="absolute bottom-10 left-1/4 w-8 h-8 animate-sparkle opacity-60">
             <img src="/images/designAssets/Vector.png" alt="Decoration" className="w-full h-full object-contain"
-                 style={{filter: 'hue-rotate(180deg) saturate(1.4)'}} />
+              style={{ filter: 'hue-rotate(180deg) saturate(1.4)' }} />
           </div>
-          
+
           <Container>
             <div className="text-center mb-16">
-              <h2 
+              <h2
                 className="text-4xl sm:text-5xl font-bold text-dark mb-6 animate-float"
                 style={{ fontFamily: 'Fredoka, sans-serif', textShadow: '2px 2px 0px rgba(136, 78, 165, 0.2)' }}
               >
                 🌟 Why Choose Unscripted? 🌟
               </h2>
-              <p 
+              <p
                 className="text-xl text-purple-700 max-w-3xl mx-auto"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -205,16 +214,16 @@ export default async function Home() {
           <div className="absolute bottom-10 left-1/4 w-14 h-14 animate-bounce-soft">
             <img src="/images/designAssets/Group 22.png" alt="Decoration" className="w-full h-full object-contain opacity-35" />
           </div>
-          
+
           <Container>
             <div className="text-center mb-16">
-              <h2 
+              <h2
                 className="text-4xl sm:text-5xl font-bold text-purple-900 mb-6"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}
               >
                 🎮 How It Works 🎮
               </h2>
-              <p 
+              <p
                 className="text-xl text-purple-700 max-w-3xl mx-auto"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -244,13 +253,13 @@ export default async function Home() {
                   <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center text-4xl animate-bounce-soft">
                     {step.step}
                   </div>
-                  <h3 
+                  <h3
                     className="text-2xl font-bold text-purple-900 mb-4"
                     style={{ fontFamily: 'Fredoka, sans-serif' }}
                   >
                     {step.title}
                   </h3>
-                  <p 
+                  <p
                     className="text-purple-700 leading-relaxed"
                     style={{ fontFamily: 'Poppins, sans-serif' }}
                   >
@@ -267,16 +276,16 @@ export default async function Home() {
           <div className="absolute top-1/2 right-10 w-18 h-18 animate-float delay-2">
             <img src="/images/designAssets/Vector.png" alt="Decoration" className="w-full h-full object-contain opacity-30" />
           </div>
-          
+
           <Container>
             <div className="text-center mb-16">
-              <h2 
+              <h2
                 className="text-4xl sm:text-5xl font-bold text-purple-900 mb-6"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}
               >
                 🎬 Featured Movies 🎬
               </h2>
-              <p 
+              <p
                 className="text-xl text-purple-700 max-w-3xl mx-auto"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -305,21 +314,21 @@ export default async function Home() {
           <div className="absolute bottom-10 right-1/4 w-14 h-14 animate-wobble">
             <img src="/images/designAssets/Clip path group-1.png" alt="Decoration" className="w-full h-full object-contain opacity-35" />
           </div>
-          
+
           <Container>
             <Card variant="cinema" className="p-12 text-center relative overflow-hidden">
               {/* Background decorations inside the card */}
               <div className="absolute top-4 left-4 w-8 h-8 bg-yellow-400 rounded-full animate-pulse"></div>
-              <div className="absolute top-4 right-4 w-6 h-6 bg-pink-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-              <div className="absolute bottom-4 left-1/2 w-4 h-4 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-              
-              <h2 
+              <div className="absolute top-4 right-4 w-6 h-6 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute bottom-4 left-1/2 w-4 h-4 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+
+              <h2
                 className="text-3xl sm:text-4xl font-bold text-purple-900 mb-6"
                 style={{ fontFamily: 'Fredoka, sans-serif' }}
               >
                 🎉 Ready to Create Movie Magic? 🎉
               </h2>
-              <p 
+              <p
                 className="text-xl text-purple-800 mb-8 max-w-2xl mx-auto leading-relaxed"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >

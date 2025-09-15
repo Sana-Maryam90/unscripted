@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 import Button from '../ui/Button';
 import PhaserGameContainer from './PhaserGameContainer';
 import CharacterSelectionModal from './CharacterSelectionModal';
+import MapModal from './MapModal';
 
 const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
     const [messages, setMessages] = useState([]);
@@ -18,6 +19,8 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
     const [showChat, setShowChat] = useState(false);
     const [showCharacterSelection, setShowCharacterSelection] = useState(false);
     const [availableCharacterSlots, setAvailableCharacterSlots] = useState([]);
+    const [showWorldMap, setShowWorldMap] = useState(false);
+    const [selectedMapLocation, setSelectedMapLocation] = useState(null);
     const messagesEndRef = useRef(null);
 
     // Get character and movie from localStorage
@@ -317,12 +320,26 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
                             </button>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-mono">
+                    <div className="flex items-center gap-3 text-sm font-mono">
                         <div className={`w-3 h-3 ${isConnected ? 'bg-green-400' : 'bg-red-400'} animate-pulse`}
-                            style={{ imageRendering: 'pixelated' }}></div>
+                            style={{ imageRendering: 'pixelated' }} />
                         <span className={`${isConnected ? 'text-green-400' : 'text-red-400'} font-bold`}>
                             {isConnected ? 'ONLINE' : 'OFFLINE'}
                         </span>
+
+                        {/* Map Button – right next to ONLINE */}
+                        <button
+                            onClick={() => setShowWorldMap(true)}
+                            className="ml-3 p-1.5 border border-white/30 hover:border-white bg-black/30 hover:bg-black/60 transition"
+                            title="Open World Map"
+                        >
+                            <img
+                                src="/assets/wizarding/maps/icon_map.png"
+                                alt="Map"
+                                className="w-6 h-6"
+                                style={{ imageRendering: 'pixelated' }}
+                            />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -407,6 +424,18 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Selected Map Location Debug */}
+                    {selectedMapLocation && (
+                        <div className="px-6 py-3 border-t-2 border-white/30 text-white font-mono text-sm">
+                            <div>Selected Location: <span className="font-bold">{selectedMapLocation.name}</span></div>
+                            <div className="text-xs text-gray-300 mt-1">
+                                {Object.entries(selectedMapLocation.props).map(([k, v]) => (
+                                    <span key={k} className="mr-3">{k}: {String(v)}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Controls (ready / abandon) - fixed at bottom */}
                     <div className="p-6 border-t-2 border-white/50">
@@ -527,6 +556,17 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
                     availableSlots={availableCharacterSlots}
                     onSelectCharacter={handleCharacterSelect}
                     onClose={() => setShowCharacterSelection(false)}
+                />
+            )}
+
+            {/* World Map Modal */}
+            {showWorldMap && (
+                <MapModal
+                    onClose={() => setShowWorldMap(false)}
+                    onSelectLocation={(loc) => {
+                        setSelectedMapLocation(loc); // { name, props }
+                        // For later: socket.emit('select-location', loc) or update local UI
+                    }}
                 />
             )}
         </div>

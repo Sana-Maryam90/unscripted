@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Character Sprite Test</title>
+    <style>
+        body { 
+            background: #1a1a2e; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+        }
+        .sprite-test {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .sprite-test img {
+            border: 2px solid #333;
+            background: #2a2a4e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Character Sprite Test</h1>
+    <p>Testing if character sprite files are accessible:</p>
+    
+    <div class="sprite-test">
+        <h3>Male Wizard 1 (Harry)</h3>
+        <img src="/assets/wizarding/player_characters/male_wizard_1/idle.png" alt="Male Wizard 1 Idle" width="256" height="256">
+        <br>Idle Animation
+    </div>
+    
+    <div class="sprite-test">
+        <h3>Female Wizard 1 (Hermione)</h3>
+        <img src="/assets/wizarding/player_characters/female_wizard_1/idle.png" alt="Female Wizard 1 Idle" width="256" height="256">
+        <br>Idle Animation
+    </div>
+    
+    <div class="sprite-test">
+        <h3>Male Wizard 2 (Ron)</h3>
+        <img src="/assets/wizarding/player_characters/male_wizard_2/idle.png" alt="Male Wizard 2 Idle" width="256" height="256">
+        <br>Idle Animation
+    </div>
+    
+    <div class="sprite-test">
+        <h3>Female Wizard 2</h3>
+        <img src="/assets/wizarding/player_characters/female_wizard_2/idle.png" alt="Female Wizard 2 Idle" width="256" height="256">
+        <br>Idle Animation
+    </div>
+
+    <h2>Walk Animations</h2>
+    
+    <div class="sprite-test">
+        <h3>Male Wizard 1 Walk</h3>
+        <img src="/assets/wizarding/player_characters/male_wizard_1/walk.png" alt="Male Wizard 1 Walk" width="256" height="256">
+        <br>Walk Animation
+    </div>
+    
+    <div class="sprite-test">
+        <h3>Female Wizard 1 Walk</h3>
+        <img src="/assets/wizarding/player_characters/female_wizard_1/walk.png" alt="Female Wizard 1 Walk" width="256" height="256">
+        <br>Walk Animation
+    </div>
+
+    <script>
+        // Test if images load successfully
+        document.querySelectorAll('img').forEach(img => {
+            img.onload = () => {
+                console.log('✅ Loaded:', img.src);
+                img.style.border = '2px solid green';
+            };
+            img.onerror = () => {
+                console.error('❌ Failed to load:', img.src);
+                img.style.border = '2px solid red';
+                img.alt = 'FAILED TO LOAD: ' + img.alt;
+            };
+        });
+    </script>
+</body>
+</html>

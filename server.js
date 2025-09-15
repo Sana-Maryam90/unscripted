@@ -62,6 +62,7 @@ app.prepare().then(() => {
                     socketId: socket.id,
                     isHost: true,
                     characterId: null,
+                    charId: null, // For Phaser lobby
                     status: 'online',
                     isReady: false,
                     joinedAt: new Date()
@@ -81,6 +82,9 @@ app.prepare().then(() => {
                     turnTimeLimit: 60, // seconds
                     allowSpectators: false
                 },
+                // Character slot management
+                availableCharacterSlots: ['female_wizard_1', 'female_wizard_2', 'male_wizard_1', 'male_wizard_2'],
+                takenCharacterSlots: [],
                 createdAt: new Date()
             };
 
@@ -163,6 +167,7 @@ app.prepare().then(() => {
                 socketId: socket.id,
                 isHost: session.players.length === 0, // First player is host
                 characterId: characterId || null,
+                charId: null, // For Phaser lobby - will be set when they select character
                 status: 'online',
                 joinedAt: new Date()
             };
@@ -782,6 +787,49 @@ app.prepare().then(() => {
             console.log(`🚀 Phaser game started in room ${session.roomCode}`);
         });
 
+        // Handle character selection for Phaser lobby
+        socket.on('select-character-lobby', (data) => {
+            console.log('🧙 Character selection for lobby:', data);
+
+            const connectionInfo = activeConnections.get(socket.id);
+            if (!connectionInfo) return;
+
+            const { roomId } = connectionInfo;
+            const session = gameSessions.get(roomId);
+            if (!session) return;
+
+            const player = session.players.find(p => p.socketId === socket.id);
+            if (!player) return;
+
+            const { charId } = data;
+
+            // Check if character is available
+            if (!session.availableCharacterSlots.includes(charId)) {
+                socket.emit('character-selection-error', { message: 'Character not available' });
+                return;
+            }
+
+            // Free up previous character if player had one
+            if (player.charId) {
+                session.availableCharacterSlots.push(player.charId);
+                session.takenCharacterSlots = session.takenCharacterSlots.filter(c => c !== player.charId);
+            }
+
+            // Assign new character
+            player.charId = charId;
+            session.availableCharacterSlots = session.availableCharacterSlots.filter(c => c !== charId);
+            session.takenCharacterSlots.push(charId);
+
+            // Notify all players of updated character slots
+            io.to(roomId).emit('character-slots-updated', {
+                availableSlots: session.availableCharacterSlots,
+                takenSlots: session.takenCharacterSlots,
+                playerCharacters: session.players.map(p => ({ id: p.socketId, charId: p.charId, name: p.name }))
+            });
+
+            console.log(`🧙 ${player.name} selected character ${charId} in room ${session.roomCode}`);
+        });
+
         // Handle player joining Phaser lobby
         socket.on('join-lobby', (data) => {
             console.log('🎮 join-lobby received from', socket.id, 'with data:', data);
@@ -808,8 +856,32 @@ app.prepare().then(() => {
 
             const { charId, x, y } = data;
 
+            // If player doesn't have a character yet, send character selection
+            if (!player.charId && !charId) {
+                socket.emit('show-character-selection', {
+                    availableSlots: session.availableCharacterSlots,
+                    takenSlots: session.takenCharacterSlots
+                });
+                return;
+            }
+
+            // If charId provided, try to assign it (for host with localStorage)
+            if (charId && !player.charId) {
+                if (session.availableCharacterSlots.includes(charId)) {
+                    player.charId = charId;
+                    session.availableCharacterSlots = session.availableCharacterSlots.filter(c => c !== charId);
+                    session.takenCharacterSlots.push(charId);
+                } else {
+                    // Character taken, send selection modal
+                    socket.emit('show-character-selection', {
+                        availableSlots: session.availableCharacterSlots,
+                        takenSlots: session.takenCharacterSlots
+                    });
+                    return;
+                }
+            }
+
             // Update player's lobby state
-            player.charId = charId;
             player.x = x || 400;
             player.y = y || 300;
             player.action = 'idle';
@@ -819,7 +891,7 @@ app.prepare().then(() => {
 
             // Send snapshot of ALL players to the newcomer (use socketId for Phaser IDs)
             socket.emit('room-snapshot', {
-                players: session.players.map(p => ({
+                players: session.players.filter(p => p.charId).map(p => ({
                     id: p.socketId, // use socketId for Phaser IDs
                     charId: p.charId,
                     x: p.x,
@@ -909,6 +981,21 @@ app.prepare().then(() => {
                         player.status = 'disconnected';
                         // Notify Phaser clients right away so rectangles disappear
                         io.to(roomId).emit('player-left', { playerId: socket.id });
+
+                        // Free up character slot immediately
+                        if (player.charId && session.availableCharacterSlots && session.takenCharacterSlots) {
+                            session.availableCharacterSlots.push(player.charId);
+                            session.takenCharacterSlots = session.takenCharacterSlots.filter(c => c !== player.charId);
+                            player.charId = null;
+
+                            // Notify remaining players of updated character slots
+                            io.to(roomId).emit('character-slots-updated', {
+                                availableSlots: session.availableCharacterSlots,
+                                takenSlots: session.takenCharacterSlots,
+                                playerCharacters: session.players.filter(p => p.charId).map(p => ({ id: p.socketId, charId: p.charId, name: p.name }))
+                            });
+                        }
+
                         player.socketId = null;
                     }
 

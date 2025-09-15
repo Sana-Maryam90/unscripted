@@ -1,5 +1,7 @@
 import * as Phaser from 'phaser';
 import AssetLoader from '../AssetLoader.js';
+import CharacterFactory from '../CharacterFactory.js';
+import { CHAR_ID_TO_KEY, getCharacterKey } from '../characters.js';
 
 class LobbyScene extends Phaser.Scene {
     constructor() {
@@ -90,6 +92,24 @@ class LobbyScene extends Phaser.Scene {
         // Load Harry Potter lobby assets using AssetLoader
         this.assetLoader.loadLobbyAssets();
 
+        // Preload local player's selected character up-front (faster spawn)
+        const myCharKey = getCharacterKey(this.charId);
+        CharacterFactory.preloadCharacter(this, myCharKey, ['idle', 'walk', 'run']);
+
+        // Optionally: also preload the 3 other characters to avoid pop-in
+        ['female_wizard_1', 'female_wizard_2', 'male_wizard_1', 'male_wizard_2']
+            .filter(k => k !== myCharKey)
+            .forEach(k => CharacterFactory.preloadCharacter(this, k, ['idle', 'walk', 'run']));
+
+        this.load.once('complete', () => {
+            // create default idles so first frames are ready
+            ['female_wizard_1', 'female_wizard_2', 'male_wizard_1', 'male_wizard_2'].forEach(k => {
+                CharacterFactory.ensureAnims(this, k, 'idle', 6, -1);
+                CharacterFactory.ensureAnims(this, k, 'walk', 10, -1);
+                CharacterFactory.ensureAnims(this, k, 'run', 12, -1);
+            });
+        });
+
         // Set up loading error handlers
         this.load.on('loaderror', (file) => {
             console.error('❌ Failed to load file:', file.key, file.src);
@@ -128,6 +148,7 @@ class LobbyScene extends Phaser.Scene {
         });
 
         console.log('📦 Loading Harry Potter lobby assets...');
+        this.load.start(); // needed only if you call load inside preload after it has already run
     }
 
     create() {
@@ -555,42 +576,46 @@ class LobbyScene extends Phaser.Scene {
         }
 
         // Initial snapshot when we join
-        this.socket.on('room-snapshot', (snapshot) => {
+        this.socket.on('room-snapshot', async (snapshot) => {
             console.log('📸 Received snapshot:', snapshot);
             console.log('🆔 My playerId:', this.playerId, 'Socket ID:', this.socket?.id);
-            (snapshot.players || [])
-                .filter(p => {
-                    const isMe = p.id === this.playerId || p.id === this.socket?.id;
-                    console.log('🔍 Player', p.id, 'isMe:', isMe);
-                    return !isMe;
-                })
-                .forEach(p => this.addRemotePlayer(p));
+            for (const p of (snapshot.players || [])) {
+                const isMe = p.id === this.playerId || p.id === this.socket?.id;
+                console.log('🔍 Player', p.id, 'isMe:', isMe);
+                if (!isMe) {
+                    await this.addRemotePlayer(p);
+                }
+            }
         });
 
         // New player arrived
-        this.socket.on('player-spawn', (p) => {
+        this.socket.on('player-spawn', async (p) => {
             console.log('✨ Player spawned:', p);
             console.log('🆔 My playerId:', this.playerId, 'Socket ID:', this.socket?.id);
             const isMe = p.id === this.playerId || p.id === this.socket?.id;
             console.log('🔍 Spawn player', p.id, 'isMe:', isMe);
-            if (!isMe) this.addRemotePlayer(p);
+            if (!isMe) await this.addRemotePlayer(p);
         });
 
         // Player left
         this.socket.on('player-left', ({ playerId }) => this.removeRemotePlayer(playerId));
 
         // Movement updates
-        this.socket.on('player-movement', (move) => {
+        this.socket.on('player-movement', async (move) => {
             if (move.id === this.playerId) return;
             let rp = this.players.get(move.id);
             if (!rp) {
-                this.addRemotePlayer(move);
+                await this.addRemotePlayer(move);
                 rp = this.players.get(move.id);
             }
             if (rp) {
                 // Smooth interpolation
-                rp.x = Phaser.Math.Linear(rp.x, move.x, 0.6);
-                rp.y = Phaser.Math.Linear(rp.y, move.y, 0.6);
+                rp.setPosition(move.x, move.y);
+
+                // Update animation
+                const charKey = rp.charKey || getCharacterKey(move.charId || 'male_wizard_1');
+                CharacterFactory.play(this, rp, charKey, move.action || 'idle', move.direction || 'down');
+
                 rp.action = move.action;
                 rp.direction = move.direction;
             }
@@ -618,58 +643,79 @@ class LobbyScene extends Phaser.Scene {
     createLocalPlayer() {
         const startX = 500; // Start in open area
         const startY = 500;
+        const charKey = getCharacterKey(this.charId);
 
-        // Create visible green rectangle for local player
-        const rect = this.add.rectangle(startX, startY, 32, 32, 0x00ff00);
-        this.physics.add.existing(rect);                 // dynamic body
-        rect.body.setCollideWorldBounds(true);
+        // Ensure animations exist for common actions
+        CharacterFactory.ensureAnims(this, charKey, 'idle', 6, -1);
+        CharacterFactory.ensureAnims(this, charKey, 'walk', 10, -1);
+        CharacterFactory.ensureAnims(this, charKey, 'run', 12, -1);
+
+        // Replace rectangle with physics sprite
+        const me = this.physics.add.sprite(startX, startY, `pc:${charKey}:idle`, 0);
+        me.setSize(28, 38).setOffset(18, 24); // tweak body for 64×64 visuals
+        me.body.setCollideWorldBounds(true);
 
         // Make player collide with walls
         if (this.wallsGroup) {
-            this.physics.add.collider(rect, this.wallsGroup);
+            this.physics.add.collider(me, this.wallsGroup);
             console.log('✅ Local player collision with walls enabled');
         }
 
         // Camera follows player with smooth movement
-        this.cameras.main.startFollow(rect, true, 0.1, 0.1);
+        this.cameras.main.startFollow(me, true, 0.1, 0.1);
 
-        this.localPlayer = rect;
+        this.localPlayer = me;
         this.playerId = this.playerId || this.socket?.id || null;
         this.localPlayer.playerId = this.playerId;
         this.localPlayer.charId = this.charId;
+        this.localPlayer.charKey = charKey;
         this.localPlayer.action = 'idle';
         this.localPlayer.direction = 'down';
 
+        // Play initial idle animation
+        CharacterFactory.play(this, me, charKey, 'idle', 'down');
+
         // Note: join-lobby is now emitted in the connect handler to ensure proper timing
 
-        console.log('👤 Local player created as green rectangle at:', startX, startY, 'with ID:', this.localPlayer.playerId);
+        console.log('👤 Local player created as character sprite at:', startX, startY, 'with ID:', this.localPlayer.playerId, 'character:', charKey);
     }
 
     handlePlayerInput() {
         if (!this.localPlayer?.body) return;
 
-        const speed = 200;
-        const body = this.localPlayer.body;
-        body.setVelocity(0);
+        const me = this.localPlayer;
+        const charKey = me.charKey;
+        let vx = 0, vy = 0, action = 'idle', dir = 'down';
 
-        if (this.cursors.left.isDown || this.wasdKeys.A.isDown)
-            body.setVelocityX(-speed);
-        else if (this.cursors.right.isDown || this.wasdKeys.D.isDown)
-            body.setVelocityX(speed);
+        // Handle keyboard input
+        const speed = this.input.keyboard.checkDown(this.input.keyboard.addKey('SHIFT')) ? 180 : 110;
 
-        if (this.cursors.up.isDown || this.wasdKeys.W.isDown)
-            body.setVelocityY(-speed);
-        else if (this.cursors.down.isDown || this.wasdKeys.S.isDown)
-            body.setVelocityY(speed);
-
-        this.localPlayer.action = (body.velocity.x || body.velocity.y) ? 'walk' : 'idle';
-
-        // Update visual feedback
-        if (this.localPlayer.action === 'walk') {
-            this.localPlayer.setFillStyle(0x00ff88); // Lighter green when moving
-        } else {
-            this.localPlayer.setFillStyle(0x00ff00); // Normal green when idle
+        if (this.cursors.left.isDown || this.wasdKeys.A.isDown) {
+            vx = -speed;
+            dir = 'left';
+        } else if (this.cursors.right.isDown || this.wasdKeys.D.isDown) {
+            vx = speed;
+            dir = 'right';
         }
+
+        if (this.cursors.up.isDown || this.wasdKeys.W.isDown) {
+            vy = -speed;
+            dir = 'up';
+        } else if (this.cursors.down.isDown || this.wasdKeys.S.isDown) {
+            vy = speed;
+            dir = 'down';
+        }
+
+        me.setVelocity(vx, vy);
+
+        if (vx || vy) action = (Math.abs(vx) + Math.abs(vy)) > 120 ? 'run' : 'walk';
+
+        // Update animation
+        CharacterFactory.play(this, me, charKey, action, dir);
+
+        // Store current state
+        me.action = action;
+        me.direction = dir;
 
         this.broadcastMovement();
     }
@@ -692,44 +738,55 @@ class LobbyScene extends Phaser.Scene {
     }
 
     updateAnimations() {
-        // Visual feedback for rectangles
-        if (this.localPlayer) {
-            // Change color based on movement state for visual feedback
-            if (this.localPlayer.action === 'walk') {
-                this.localPlayer.setFillStyle(0x00ff88); // Lighter green when moving
-            } else {
-                this.localPlayer.setFillStyle(0x00ff00); // Normal green when idle
-            }
-        }
+        // Animations are now handled by CharacterFactory.play() in handlePlayerInput()
+        // This method can be used for other visual effects if needed
     }
 
-    addRemotePlayer(playerData) {
+    async addRemotePlayer(playerData) {
         if (this.players.has(playerData.id)) {
             console.log('⚠️ Player already exists:', playerData.id);
             return;
         }
 
-        console.log('🔴 Creating red rectangle for remote player:', playerData);
+        const charKey = getCharacterKey(playerData.charId || 'male_wizard_1');
+        console.log('🧙 Creating character sprite for remote player:', playerData, 'character:', charKey);
 
-        // Create visible red rectangle for remote player
-        const rect = this.add.rectangle(playerData.x, playerData.y, 32, 32, 0xff4444);
-        this.physics.add.existing(rect);
-        rect.body.setCollideWorldBounds(true);
+        // Ensure character assets are loaded
+        await this.ensureLoadedAndAnimated(charKey, ['idle', 'walk', 'run']);
+
+        // Ensure animations exist
+        CharacterFactory.ensureAnims(this, charKey, 'idle', 6, -1);
+        CharacterFactory.ensureAnims(this, charKey, 'walk', 10, -1);
+        CharacterFactory.ensureAnims(this, charKey, 'run', 12, -1);
+
+        // Create physics sprite
+        const s = this.physics.add.sprite(
+            playerData.x ?? 400,
+            playerData.y ?? 300,
+            `pc:${charKey}:idle`,
+            0
+        );
+        s.setSize(28, 38).setOffset(18, 24); // tweak body for 64×64 visuals
+        s.body.setCollideWorldBounds(true);
 
         // Make remote player collide with walls
         if (this.wallsGroup) {
-            this.physics.add.collider(rect, this.wallsGroup);
+            this.physics.add.collider(s, this.wallsGroup);
         }
 
         // Store player data
-        rect.playerId = playerData.id;
-        rect.charId = playerData.charId;
-        rect.action = playerData.action;
-        rect.direction = playerData.direction;
+        s.playerId = playerData.id;
+        s.charId = playerData.charId;
+        s.charKey = charKey;
+        s.action = playerData.action || 'idle';
+        s.direction = playerData.direction || 'down';
 
-        this.players.set(playerData.id, rect);
+        this.players.set(playerData.id, s);
 
-        console.log('✅ Remote player added as red rectangle:', playerData.id, 'at', playerData.x, playerData.y);
+        // Play initial animation
+        CharacterFactory.play(this, s, charKey, s.action, s.direction);
+
+        console.log('✅ Remote player added as character sprite:', playerData.id, 'at', playerData.x, playerData.y, 'character:', charKey);
     }
 
     updateRemotePlayer(moveData) {
@@ -737,19 +794,15 @@ class LobbyScene extends Phaser.Scene {
         if (!player) return;
 
         // Smooth interpolation for remote player position
-        player.x = Phaser.Math.Linear(player.x, moveData.x, 0.6);
-        player.y = Phaser.Math.Linear(player.y, moveData.y, 0.6);
+        player.setPosition(moveData.x, moveData.y);
 
         // Update player state
         player.action = moveData.action;
         player.direction = moveData.direction;
 
-        // Update visual feedback
-        if (moveData.action === 'walk') {
-            player.setFillStyle(0xff8800); // Orange when moving
-        } else {
-            player.setFillStyle(0xff4444); // Red when idle
-        }
+        // Update animation
+        const charKey = player.charKey || getCharacterKey(moveData.charId || 'male_wizard_1');
+        CharacterFactory.play(this, player, charKey, moveData.action || 'idle', moveData.direction || 'down');
     }
 
     removeRemotePlayer(playerId) {
@@ -758,6 +811,28 @@ class LobbyScene extends Phaser.Scene {
             player.destroy();
             this.players.delete(playerId);
             console.log('👋 Remote player removed:', playerId);
+        }
+    }
+
+    // Utility method to ensure character assets are loaded
+    async ensureLoadedAndAnimated(charKey, actions) {
+        const needsLoading = actions.some(a => !this.textures.exists(`pc:${charKey}:${a}`));
+
+        if (needsLoading) {
+            actions.forEach(a => {
+                if (!this.textures.exists(`pc:${charKey}:${a}`)) {
+                    this.load.spritesheet(`pc:${charKey}:${a}`,
+                        `/assets/wizarding/player_characters/${charKey}/${a}.png`,
+                        { frameWidth: 64, frameHeight: 64 }
+                    );
+                }
+            });
+
+            return new Promise(resolve => {
+                if (this.load.totalToLoad() === 0) return resolve();
+                this.load.once('complete', () => resolve());
+                this.load.start();
+            });
         }
     }
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import Button from '../ui/Button';
 import PhaserGameContainer from './PhaserGameContainer';
+import CharacterSelectionModal from './CharacterSelectionModal';
 
 const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
     const [messages, setMessages] = useState([]);
@@ -15,6 +16,8 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
     const [isReady, setIsReady] = useState(false);
     const [gameInstance, setGameInstance] = useState(null);
     const [showChat, setShowChat] = useState(false);
+    const [showCharacterSelection, setShowCharacterSelection] = useState(false);
+    const [availableCharacterSlots, setAvailableCharacterSlots] = useState([]);
     const messagesEndRef = useRef(null);
 
     // Get character and movie from localStorage
@@ -29,8 +32,8 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
         if (selectedCharacter) {
             try {
                 const character = JSON.parse(selectedCharacter);
-                // Convert character name to a valid charId
-                const characterId = character.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                // Use the character ID directly from the movie data
+                const characterId = character.id || character.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
                 setCharId(characterId);
                 console.log('🧙 Selected character for Phaser lobby:', character.name, '→', characterId);
             } catch (error) {
@@ -133,7 +136,13 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
 
         socket.on('player-left', (data) => {
             console.log('👋 Player left:', data.playerName);
-            setPlayers(data.room.players || []);
+
+            if (data.room && data.room.players) {
+                setPlayers(data.room.players);
+            } else {
+                // fall back: just remove that player from local state
+                setPlayers(prev => prev.filter(p => p.id !== data.playerId));
+            }
 
             const systemMessage = {
                 id: Date.now().toString(),
@@ -174,6 +183,23 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
             setMessages(prev => [...prev, systemMessage]);
         });
 
+        // Character selection for Phaser lobby
+        socket.on('show-character-selection', (data) => {
+            console.log('🧙 Show character selection:', data);
+            setAvailableCharacterSlots(data.availableSlots);
+            setShowCharacterSelection(true);
+        });
+
+        socket.on('character-slots-updated', (data) => {
+            console.log('🔄 Character slots updated:', data);
+            setAvailableCharacterSlots(data.availableSlots);
+        });
+
+        socket.on('character-selection-error', (data) => {
+            console.error('❌ Character selection error:', data.message);
+            alert(data.message);
+        });
+
         socket.on('error', (error) => {
             console.error('❌ Socket error:', error);
             alert(error.message);
@@ -188,6 +214,9 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
                 socket.off('player-left');
                 socket.off('player-ready-changed');
                 socket.off('game-started');
+                socket.off('show-character-selection');
+                socket.off('character-slots-updated');
+                socket.off('character-selection-error');
                 socket.off('error');
             }
         };
@@ -223,6 +252,17 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
     const handleGameReady = (game) => {
         setGameInstance(game);
         console.log('🎮 Phaser game instance ready:', game);
+    };
+
+    const handleCharacterSelect = (charId) => {
+        if (!socket) return;
+
+        console.log('🧙 Selecting character:', charId);
+        socket.emit('select-character-lobby', { charId });
+        setShowCharacterSelection(false);
+
+        // Update local charId for Phaser
+        setCharId(charId);
     };
 
     const formatTime = (timestamp) => {
@@ -480,6 +520,15 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
                     )}
                 </div>
             </div>
+
+            {/* Character Selection Modal */}
+            {showCharacterSelection && (
+                <CharacterSelectionModal
+                    availableSlots={availableCharacterSlots}
+                    onSelectCharacter={handleCharacterSelect}
+                    onClose={() => setShowCharacterSelection(false)}
+                />
+            )}
         </div>
     );
 };

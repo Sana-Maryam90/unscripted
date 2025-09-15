@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Sprite Assignment</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+        .player { margin: 10px 0; padding: 10px; border: 1px solid #333; background: #2a2a2a; }
+        .sprite { font-weight: bold; color: #4ade80; }
+        button { padding: 10px 20px; margin: 5px; background: #4338ca; color: white; border: none; cursor: pointer; }
+        button:hover { background: #3730a3; }
+        #log { background: #000; padding: 10px; height: 300px; overflow-y: auto; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>🧙 Sprite Assignment Test</h1>
+    
+    <div>
+        <button onclick="createRoom()">Create Room</button>
+        <button onclick="joinRoom()">Join Room</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div>
+        <input type="text" id="roomCode" placeholder="Room Code" style="padding: 10px; margin: 10px 0;">
+        <input type="text" id="playerName" placeholder="Player Name" style="padding: 10px; margin: 10px 0;">
+    </div>
+    
+    <div id="players"></div>
+    <div id="log"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentRoomCode = '';
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function updatePlayers(players) {
+            const playersDiv = document.getElementById('players');
+            playersDiv.innerHTML = '<h3>Players in Room ' + currentRoomCode + ':</h3>';
+            players.forEach(player => {
+                playersDiv.innerHTML += `
+                    <div class="player">
+                        <strong>${player.name}</strong> ${player.isHost ? '(HOST)' : ''}<br>
+                        Sprite: <span class="sprite">${player.charId || 'None'}</span><br>
+                        Status: ${player.status}
+                    </div>
+                `;
+            });
+        }
+        
+        function createRoom() {
+            const playerName = document.getElementById('playerName').value || 'TestHost';
+            const playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+            
+            log('Creating room as ' + playerName);
+            socket.emit('create-room', {
+                mode: 'phaser-lobby',
+                playerName: playerName,
+                playerId: playerId
+            });
+        }
+        
+        function joinRoom() {
+            const roomCode = document.getElementById('roomCode').value;
+            const playerName = document.getElementById('playerName').value || 'TestPlayer';
+            const playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+            
+            if (!roomCode) {
+                alert('Please enter a room code');
+                return;
+            }
+            
+            log('Joining room ' + roomCode + ' as ' + playerName);
+            socket.emit('join-room', {
+                roomCode: roomCode,
+                playerId: playerId,
+                playerName: playerName,
+                gameType: 'phaser-lobby'
+            });
+        }
+        
+        // Socket event listeners
+        socket.on('room-created', (data) => {
+            log('✅ Room created: ' + data.roomCode);
+            currentRoomCode = data.roomCode;
+            document.getElementById('roomCode').value = data.roomCode;
+            updatePlayers(data.session.players);
+        });
+        
+        socket.on('room-joined', (data) => {
+            log('✅ Joined room: ' + data.roomCode);
+            currentRoomCode = data.roomCode;
+            updatePlayers(data.room.players);
+            if (data.player.charId) {
+                log('🧙 Auto-assigned sprite: ' + data.player.charId);
+            }
+        });
+        
+        socket.on('player-joined', (data) => {
+            log('👤 Player joined: ' + data.player.name);
+            updatePlayers(data.room.players);
+            if (data.player.charId) {
+                log('🧙 New player got sprite: ' + data.player.charId);
+            }
+        });
+        
+        socket.on('session-updated', (session) => {
+            log('🔄 Session updated');
+            updatePlayers(session.players);
+        });
+        
+        socket.on('error', (error) => {
+            log('❌ Error: ' + error.message);
+        });
+        
+        socket.on('connect', () => {
+            log('🔌 Connected to server');
+        });
+        
+        socket.on('disconnect', () => {
+            log('❌ Disconnected from server');
+        });
+    </script>
+</body>
+</html>

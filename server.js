@@ -50,6 +50,17 @@ app.prepare().then(() => {
             const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             const roomId = `room_${roomCode}`;
 
+            // Auto-assign sprite for host if it's a Phaser lobby
+            const availableSlots = ['female_wizard_1', 'female_wizard_2', 'male_wizard_1', 'male_wizard_2'];
+            let hostCharId = null;
+            let takenSlots = [];
+
+            if (mode === 'phaser-lobby') {
+                hostCharId = availableSlots.shift(); // Give host the first sprite
+                takenSlots.push(hostCharId);
+                console.log(`🧙 Auto-assigned sprite ${hostCharId} to host ${playerName} (Available: ${availableSlots.length}, Taken: ${takenSlots.length})`);
+            }
+
             const gameSession = {
                 id: roomId,
                 roomCode,
@@ -62,7 +73,7 @@ app.prepare().then(() => {
                     socketId: socket.id,
                     isHost: true,
                     characterId: null,
-                    charId: null, // For Phaser lobby
+                    charId: hostCharId, // Auto-assigned for Phaser lobby
                     status: 'online',
                     isReady: false,
                     joinedAt: new Date()
@@ -83,8 +94,8 @@ app.prepare().then(() => {
                     allowSpectators: false
                 },
                 // Character slot management
-                availableCharacterSlots: ['female_wizard_1', 'female_wizard_2', 'male_wizard_1', 'male_wizard_2'],
-                takenCharacterSlots: [],
+                availableCharacterSlots: availableSlots, // Remaining slots after host assignment
+                takenCharacterSlots: takenSlots,
                 createdAt: new Date()
             };
 
@@ -104,7 +115,7 @@ app.prepare().then(() => {
         // Handle room joining
         socket.on('join-room', (data) => {
             console.log('🚪 Join room request:', data);
-            const { roomCode, playerId, playerName, movieId, characterId } = data;
+            const { roomCode, playerId, playerName, movieId, characterId, gameType } = data;
 
             const roomId = `room_${roomCode}`;
             let session = gameSessions.get(roomId);
@@ -116,7 +127,7 @@ app.prepare().then(() => {
                     id: roomId,
                     roomCode,
                     movieId: null,
-                    mode: 'test-chat',
+                    mode: gameType || 'test-chat',
                     state: 'waiting',
                     players: [],
                     messages: [],
@@ -126,6 +137,9 @@ app.prepare().then(() => {
                         completedChoices: [],
                         generatedContent: []
                     },
+                    // Character slot management for Phaser lobby
+                    availableCharacterSlots: ['female_wizard_1', 'female_wizard_2', 'male_wizard_1', 'male_wizard_2'],
+                    takenCharacterSlots: [],
                     createdAt: new Date()
                 };
                 gameSessions.set(roomId, session);
@@ -160,6 +174,17 @@ app.prepare().then(() => {
                 return;
             }
 
+            // Auto-assign sprite for Phaser lobby rooms
+            let assignedCharId = null;
+            if (gameType === 'phaser-lobby' && session.availableCharacterSlots && session.availableCharacterSlots.length > 0) {
+                assignedCharId = session.availableCharacterSlots.shift(); // Take first available
+                if (!session.takenCharacterSlots) {
+                    session.takenCharacterSlots = [];
+                }
+                session.takenCharacterSlots.push(assignedCharId);
+                console.log(`🧙 Auto-assigned sprite ${assignedCharId} to ${playerName} (Available: ${session.availableCharacterSlots.length}, Taken: ${session.takenCharacterSlots.length})`);
+            }
+
             // Add player to session
             const newPlayer = {
                 id: playerId,
@@ -167,7 +192,7 @@ app.prepare().then(() => {
                 socketId: socket.id,
                 isHost: session.players.length === 0, // First player is host
                 characterId: characterId || null,
-                charId: null, // For Phaser lobby - will be set when they select character
+                charId: assignedCharId, // Auto-assigned for Phaser lobby
                 status: 'online',
                 joinedAt: new Date()
             };

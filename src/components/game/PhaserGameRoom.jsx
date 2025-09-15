@@ -108,6 +108,12 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
             setPlayers(data.room.players || []);
             setMessages(data.room.messages || []);
 
+            // Use auto-assigned charId from server if available
+            if (data.player && data.player.charId) {
+                setCharId(data.player.charId);
+                console.log('🧙 Using server-assigned sprite:', data.player.charId);
+            }
+
             // Initialize game state
             if (data.room.gameState) {
                 setGameState(data.room.gameState);
@@ -118,6 +124,13 @@ const PhaserGameRoom = ({ roomCode, playerId, playerName, onLeave }) => {
             console.log('🔄 Game session updated:', session);
             setPlayers(session.players || []);
             setMessages(session.messages || []);
+
+            // Update charId if it changed for current player
+            const currentPlayer = session.players?.find(p => p.id === playerId);
+            if (currentPlayer && currentPlayer.charId && currentPlayer.charId !== charId) {
+                setCharId(currentPlayer.charId);
+                console.log('🧙 Updated sprite from session:', currentPlayer.charId);
+            }
 
             if (session.gameState) {
                 setGameState(session.gameState);

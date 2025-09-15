@@ -655,6 +655,9 @@ class LobbyScene extends Phaser.Scene {
         me.setSize(28, 38).setOffset(18, 24); // tweak body for 64×64 visuals
         me.body.setCollideWorldBounds(true);
 
+        // Make sprite bigger
+        me.setScale(1.5); // 50% bigger than original
+
         // Make player collide with walls
         if (this.wallsGroup) {
             this.physics.add.collider(me, this.wallsGroup);
@@ -768,6 +771,9 @@ class LobbyScene extends Phaser.Scene {
         );
         s.setSize(28, 38).setOffset(18, 24); // tweak body for 64×64 visuals
         s.body.setCollideWorldBounds(true);
+
+        // Make sprite bigger
+        s.setScale(1.5); // 50% bigger than original
 
         // Make remote player collide with walls
         if (this.wallsGroup) {

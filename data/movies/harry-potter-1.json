@@ -1,62 +1,154 @@
 {
   "id": "harry-potter-1",
   "title": "Harry Potter and the Philosopher's Stone",
-  "description": "A young wizard discovers his magical heritage and begins his journey at Hogwarts School of Witchcraft and Wizardry.",
-  "genre": "Fantasy",
+  "description": "Join Harry on his magical journey to Hogwarts and discover alternate paths in the wizarding world. Make choices that could change the fate of the Boy Who Lived.",
+  "poster": "/images/moviePosters/Harry Potter.jpg",
+  "genre": ["Fantasy", "Adventure", "Family"],
   "duration": "152 minutes",
-  "image": "/images/movies/harry-potter-1.jpg",
+  "releaseYear": 2001,
   "characters": [
     {
       "id": "harry",
       "name": "Harry Potter",
-      "description": "The Boy Who Lived - brave, curious, and loyal",
+      "description": "The Boy Who Lived, a young wizard discovering his magical heritage",
       "avatar": "/images/characters/harry.jpg",
-      "personality": "brave, curious, loyal"
+      "personality": "brave, curious, loyal, sometimes impulsive",
+      "background": "Raised by his muggle relatives, unaware of his fame in the wizarding world"
     },
     {
       "id": "hermione",
       "name": "Hermione Granger",
-      "description": "Brilliant witch with a love for learning",
+      "description": "A brilliant witch and Harry's loyal friend",
       "avatar": "/images/characters/hermione.jpg",
-      "personality": "intelligent, logical, determined"
+      "personality": "intelligent, logical, determined, rule-following",
+      "background": "Muggle-born witch with exceptional magical abilities and love for learning"
     },
     {
       "id": "ron",
       "name": "Ron Weasley",
-      "description": "Harry's loyal best friend from a wizarding family",
+      "description": "Harry's best friend from a pure-blood wizarding family",
       "avatar": "/images/characters/ron.jpg",
-      "personality": "loyal, humorous, brave"
+      "personality": "loyal, brave, humorous, sometimes insecure",
+      "background": "Youngest son of the Weasley family, overshadowed by his accomplished siblings"
     },
     {
-      "id": "draco",
-      "name": "Draco Malfoy",
-      "description": "Slytherin student from a pure-blood family",
-      "avatar": "/images/characters/draco.jpg",
-      "personality": "ambitious, prideful, conflicted"
+      "id": "hagrid",
+      "name": "Hagrid",
+      "description": "Keeper of Keys and Grounds at Hogwarts",
+      "avatar": "/images/characters/hagrid.jpg",
+      "personality": "kind-hearted, protective, loves magical creatures",
+      "background": "Half-giant who introduces Harry to the wizarding world"
     }
   ],
   "checkpoints": [
     {
       "id": "checkpoint-1",
       "position": 1,
-      "context": "Harry receives his Hogwarts letter",
+      "title": "The Hogwarts Letter",
+      "context": "Harry receives his Hogwarts letter on his 11th birthday",
+      "sceneDescription": "The Dursleys have taken Harry to a hut on a rock in the sea to escape the letters, but Hagrid arrives at midnight.",
       "characterChoices": {
         "harry": [
           {
             "id": "choice-1a",
-            "text": "Read the letter immediately with excitement",
-            "impact": "eager acceptance",
-            "consequences": ["excitement", "curiosity"]
+            "text": "Ask Hagrid about his parents immediately",
+            "impact": "eager for truth",
+            "consequences": ["learns about parents early", "emotional revelation"]
           },
           {
             "id": "choice-1b",
-            "text": "Hide the letter from the Dursleys",
-            "impact": "cautious approach",
-            "consequences": ["secrecy", "fear"]
+            "text": "Focus on learning about the wizarding world first",
+            "impact": "cautious curiosity",
+            "consequences": ["gradual discovery", "better preparation"]
+          },
+          {
+            "id": "choice-1c",
+            "text": "Express anger at the Dursleys for lying",
+            "impact": "confrontational",
+            "consequences": ["family conflict", "assertive personality"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-2",
+      "position": 2,
+      "title": "Diagon Alley Shopping",
+      "context": "Harry visits Diagon Alley to buy his school supplies",
+      "sceneDescription": "Harry is overwhelmed by the magical world and must make choices about his purchases and interactions.",
+      "characterChoices": {
+        "harry": [
+          {
+            "id": "choice-2a",
+            "text": "Spend extra time in Ollivanders learning about wands",
+            "impact": "magical knowledge focus",
+            "consequences": ["deeper wand connection", "magical theory understanding"]
+          },
+          {
+            "id": "choice-2b",
+            "text": "Explore Knockturn Alley despite warnings",
+            "impact": "rebellious curiosity",
+            "consequences": ["dark magic exposure", "dangerous knowledge"]
+          },
+          {
+            "id": "choice-2c",
+            "text": "Ask Hagrid more about Voldemort",
+            "impact": "seeking dangerous truth",
+            "consequences": ["early villain knowledge", "increased caution"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-3",
+      "position": 3,
+      "title": "The Sorting Hat",
+      "context": "Harry faces the Sorting Hat at Hogwarts",
+      "sceneDescription": "The Sorting Hat considers placing Harry in Slytherin, but Harry can influence this decision.",
+      "characterChoices": {
+        "harry": [
+          {
+            "id": "choice-3a",
+            "text": "Accept Slytherin and embrace ambition",
+            "impact": "dark path potential",
+            "consequences": ["different friendships", "alternative story arc"]
+          },
+          {
+            "id": "choice-3b",
+            "text": "Strongly request Gryffindor",
+            "impact": "brave determination",
+            "consequences": ["canonical path", "Gryffindor values"]
+          },
+          {
+            "id": "choice-3c",
+            "text": "Ask to be placed where he's most needed",
+            "impact": "selfless choice",
+            "consequences": ["unique sorting", "special destiny"]
           }
         ]
       }
     }
   ],
-  "baseScript": "Harry Potter lives with his cruel relatives, the Dursleys, until he discovers he's a wizard on his 11th birthday..."
+  "scenes": [
+    {
+      "id": 1,
+      "title": "The Hogwarts Letter",
+      "context": "Harry receives his Hogwarts letter on his 11th birthday. The Dursleys have taken Harry to a hut on a rock in the sea to escape the letters, but Hagrid arrives at midnight."
+    },
+    {
+      "id": 2,
+      "title": "Diagon Alley Shopping",
+      "context": "Harry visits Diagon Alley to buy his school supplies. Harry is overwhelmed by the magical world and must make choices about his purchases and interactions."
+    },
+    {
+      "id": 3,
+      "title": "The Sorting Hat",
+      "context": "Harry faces the Sorting Hat at Hogwarts. The Sorting Hat considers placing Harry in Slytherin, but Harry can influence this decision."
+    }
+  ],
+  "baseScript": "The original story follows Harry Potter as he discovers he's a wizard and begins his education at Hogwarts School of Witchcraft and Wizardry...",
+  "themes": ["friendship", "courage", "identity", "good vs evil", "belonging"],
+  "difficulty": "beginner",
+  "maxPlayers": 4,
+  "estimatedPlayTime": "45-60 minutes"
 }

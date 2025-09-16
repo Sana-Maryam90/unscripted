@@ -1,3 +1,10 @@
 {
-    "kiroAgent.configureMCP": "Disabled"
+    "kiroAgent.configureMCP": "Disabled",
+    "typescript.validate.enable": false,
+    "javascript.validate.enable": true,
+    "typescript.preferences.includePackageJsonAutoImports": "off",
+    "javascript.preferences.includePackageJsonAutoImports": "on",
+    "javascript.suggest.autoImports": true,
+    "typescript.suggest.autoImports": false,
+    "javascript.autoClosingTags": false
 }

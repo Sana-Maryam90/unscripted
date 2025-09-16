@@ -31,7 +31,7 @@ graph TB
 - **Frontend & Backend**: Next.js 15.5.0 (fullstack) with React 19.1.0
 - **Styling**: Tailwind CSS 4.0
 - **Real-time Communication**: Socket.io integrated within Next.js custom server
-- **AI Integration**: OpenAI API (GPT-4 for text, DALL-E for images)
+- **AI Integration**: Gemini API for story generation, OpenAI API (DALL-E for images)
 - **State Management**: React Context for client state
 - **Data Storage**: Redis for game sessions and room management, JSON files for movie data
 - **Language**: JavaScript (ES6+)
@@ -219,8 +219,16 @@ const storyEngine = {
 // AI Content Service functions
 const aiService = {
   async generateStorySegment(prompt) {
-    // Calls OpenAI API to generate story text
+    // Calls Gemini API to generate story text
     // prompt: { character, choice, previousContext, movieContext }
+  },
+  
+  async selectRandomScene(movieData) {
+    // Selects random scene from harryPotter.json using Gemini API
+  },
+  
+  async generateCharacterChoices(context, character) {
+    // Generates character-specific choices using Gemini API
   },
   
   async generateSceneImage(description) {
@@ -326,21 +334,25 @@ const errorHandler = {
 - **Component Testing**: React Testing Library for UI components
 - **Service Testing**: Jest for business logic and API functions
 - **Utility Testing**: Pure function testing for game logic
+- **AI Service Testing**: Mock Gemini and OpenAI services for consistent testing
 
 ### Integration Testing
 - **API Route Testing**: Next.js API route testing
 - **Socket.io Testing**: WebSocket connection and event testing
-- **AI Integration Testing**: Mock AI services for consistent testing
+- **AI Integration Testing**: Mock AI services with realistic response times
+- **Story Flow Testing**: End-to-end story generation and progression
 
 ### End-to-End Testing
 - **User Flow Testing**: Playwright for complete user journeys
 - **Multiplayer Testing**: Simulated multi-user scenarios
 - **Real-time Testing**: WebSocket event synchronization testing
+- **Story Progression Testing**: Complete story cycles with AI generation
 
 ### Performance Testing
 - **Load Testing**: Multiple concurrent rooms and players
-- **AI Response Testing**: Content generation performance metrics
+- **AI Response Testing**: Gemini API response time metrics (under 10 seconds)
 - **Memory Usage Testing**: Room cleanup and memory leak detection
+- **Animation Performance**: UI animation smoothness and responsiveness
 
 ### Test Structure
 ```

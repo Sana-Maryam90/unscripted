@@ -52,3 +52,4 @@ data/
 - Relative imports for local files
 - Absolute imports from node_modules
 - Group imports: external libraries first, then local files
+- Commands should be run in CMD not powershell

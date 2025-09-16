@@ -1,0 +1,156 @@
+{
+    "id": "harry-potter-series",
+    "title": "Harry Potter (Series)",
+    "description": "Experience the complete Harry Potter saga with multiple iconic scenes from across all films. Make choices that could reshape the wizarding world's destiny.",
+    "poster": "/images/moviePosters/Harry Potter Series.jpg",
+    "genre": ["Fantasy", "Adventure", "Family"],
+    "duration": "Multiple films",
+    "releaseYear": 2001,
+    "characters": [
+      {
+        "id": "harry",
+        "name": "Harry Potter",
+        "description": "The Boy Who Lived, the chosen one destined to defeat Voldemort",
+        "avatar": "/images/characters/harry.jpg",
+        "personality": "brave, loyal, determined, sometimes impulsive",
+        "background": "The famous wizard who survived Voldemort's killing curse as a baby"
+      },
+      {
+        "id": "hermione",
+        "name": "Hermione Granger",
+        "description": "The brightest witch of her age and Harry's loyal friend",
+        "avatar": "/images/characters/hermione.jpg",
+        "personality": "intelligent, logical, brave, rule-following but loyal",
+        "background": "Muggle-born witch with exceptional magical abilities"
+      },
+      {
+        "id": "ron",
+        "name": "Ron Weasley",
+        "description": "Harry's best friend from a pure-blood wizarding family",
+        "avatar": "/images/characters/ron.jpg",
+        "personality": "loyal, brave, humorous, sometimes insecure",
+        "background": "Youngest son of the Weasley family, Harry's most loyal friend"
+      },
+      {
+        "id": "draco",
+        "name": "Draco Malfoy",
+        "description": "Harry's rival from Slytherin house",
+        "avatar": "/images/characters/draco.jpg",
+        "personality": "proud, conflicted, ambitious, ultimately redeemable",
+        "background": "Pure-blood wizard from a Death Eater family"
+      },
+      {
+        "id": "snape",
+        "name": "Severus Snape",
+        "description": "Potions master with a complex past",
+        "avatar": "/images/characters/snape.jpg",
+        "personality": "mysterious, bitter, ultimately heroic, complex",
+        "background": "Double agent with deep connections to Harry's past"
+      },
+      {
+        "id": "voldemort",
+        "name": "Lord Voldemort",
+        "description": "The Dark Lord, Harry's ultimate nemesis",
+        "avatar": "/images/characters/voldemort.jpg",
+        "personality": "evil, powerful, fear-inducing, obsessed with immortality",
+        "background": "The most feared dark wizard of all time"
+      },
+      {
+        "id": "dumbledore",
+        "name": "Albus Dumbledore",
+        "description": "Headmaster of Hogwarts and Harry's mentor",
+        "avatar": "/images/characters/dumbledore.jpg",
+        "personality": "wise, powerful, mysterious, caring but calculating",
+        "background": "The greatest wizard of the age and leader of the Order of the Phoenix"
+      }
+    ],
+    "scenes": [
+      {
+        "id": 1,
+        "title": "The Troll in the Dungeon",
+        "context": "A massive mountain troll enters Hogwarts on Halloween night. The students are panicking as the troll wreaks havoc in the bathroom."
+      },
+      {
+        "id": 2,
+        "title": "The Philosopher's Stone",
+        "context": "Harry, Hermione, and Ron face the final chamber protecting the Philosopher's Stone, with Harry confronting Professor Quirrell and Voldemort’s spirit."
+      },
+      {
+        "id": 3,
+        "title": "The Chamber of Secrets",
+        "context": "Harry encounters Tom Riddle and the Basilisk inside the Chamber of Secrets. The giant serpent slithers closer."
+      },
+      {
+        "id": 4,
+        "title": "The Time-Turner Rescue",
+        "context": "Harry and Hermione use the Time-Turner to save Sirius Black and Buckbeak. They must avoid being seen by their past selves."
+      },
+      {
+        "id": 5,
+        "title": "The Triwizard Tournament - The Maze",
+        "context": "Harry and Cedric enter the Triwizard Maze, filled with dangerous enchantments and creatures, leading to Voldemort’s rebirth."
+      },
+      {
+        "id": 6,
+        "title": "Dumbledore vs Voldemort",
+        "context": "At the Ministry of Magic, Dumbledore and Voldemort duel fiercely, with Harry caught in the chaos."
+      },
+      {
+        "id": 7,
+        "title": "The Astronomy Tower",
+        "context": "On the Astronomy Tower, Draco confronts Dumbledore, but Death Eaters arrive. Snape’s true allegiance is unclear."
+      },
+      {
+        "id": 8,
+        "title": "Battle of Hogwarts",
+        "context": "Hogwarts is under siege. Students, professors, Death Eaters, and creatures fight in an all-out war."
+      },
+      {
+        "id": 9,
+        "title": "The Forbidden Forest",
+        "context": "Harry willingly walks into the Forbidden Forest to sacrifice himself to Voldemort, clutching the Resurrection Stone."
+      },
+      {
+        "id": 10,
+        "title": "Final Duel",
+        "context": "Harry and Voldemort face off in their climactic final duel. The fate of the wizarding world hangs in the balance."
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": "checkpoint-1",
+        "position": 1,
+        "title": "The Troll in the Dungeon",
+        "context": "A massive mountain troll enters Hogwarts on Halloween night",
+        "sceneDescription": "The students are panicking as the troll wreaks havoc in the bathroom. The trio must decide how to handle this dangerous situation.",
+        "characterChoices": {
+          "harry": [
+            {
+              "id": "choice-1a",
+              "text": "Charge at the troll to distract it",
+              "impact": "heroic bravery",
+              "consequences": ["saves friends", "risky confrontation"]
+            },
+            {
+              "id": "choice-1b", 
+              "text": "Use magic to levitate the troll's club",
+              "impact": "clever strategy",
+              "consequences": ["teamwork victory", "magical growth"]
+            },
+            {
+              "id": "choice-1c",
+              "text": "Try to lead the troll away from others",
+              "impact": "selfless protection",
+              "consequences": ["protects students", "personal danger"]
+            }
+          ]
+        }
+      }
+    ],
+    "baseScript": "Experience the most iconic moments from the Harry Potter series, where your choices can reshape the wizarding world...",
+    "themes": ["friendship", "courage", "good vs evil", "growing up", "sacrifice"],
+    "difficulty": "intermediate",
+    "maxPlayers": 4,
+    "estimatedPlayTime": "60-90 minutes"
+  }
+  

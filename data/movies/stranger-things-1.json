@@ -1,0 +1,154 @@
+{
+  "id": "stranger-things-1",
+  "title": "Stranger Things: Season 1",
+  "description": "Enter the Upside Down and help the kids of Hawkins face supernatural horrors. Your choices could save Will Byers and change the fate of the entire town.",
+  "poster": "/images/moviePosters/Stranger Things.jpg",
+  "genre": ["Horror", "Sci-Fi", "Drama", "Thriller"],
+  "duration": "8 episodes",
+  "releaseYear": 2016,
+  "characters": [
+    {
+      "id": "eleven",
+      "name": "Eleven",
+      "description": "A girl with psychokinetic abilities who escaped from Hawkins Lab",
+      "avatar": "/images/characters/eleven.jpg",
+      "personality": "quiet, powerful, loyal, traumatized but brave",
+      "background": "Subject of government experiments, possesses telekinetic powers"
+    },
+    {
+      "id": "mike",
+      "name": "Mike Wheeler",
+      "description": "Leader of the group and Eleven's closest friend",
+      "avatar": "/images/characters/mike.jpg",
+      "personality": "determined, loyal, protective, natural leader",
+      "background": "Middle schooler who becomes Eleven's protector and friend"
+    },
+    {
+      "id": "dustin",
+      "name": "Dustin Henderson",
+      "description": "The group's comic relief with a love for science",
+      "avatar": "/images/characters/dustin.jpg",
+      "personality": "curious, optimistic, scientific, brave despite fear",
+      "background": "Smart kid who uses science to understand the supernatural events"
+    },
+    {
+      "id": "joyce",
+      "name": "Joyce Byers",
+      "description": "Will's mother who refuses to believe her son is dead",
+      "avatar": "/images/characters/joyce.jpg",
+      "personality": "determined, emotional, protective, intuitive",
+      "background": "Single mother who will do anything to save her missing son"
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "checkpoint-1",
+      "position": 1,
+      "title": "Will's Disappearance",
+      "context": "Will Byers goes missing after a D&D campaign",
+      "sceneDescription": "The boys discover Will is missing and must decide how to search for their friend while adults dismiss their concerns.",
+      "characterChoices": {
+        "mike": [
+          {
+            "id": "choice-1a",
+            "text": "Organize a secret search party with the boys",
+            "impact": "independent action",
+            "consequences": ["kids take charge", "dangerous exploration"]
+          },
+          {
+            "id": "choice-1b",
+            "text": "Try to convince adults to take it seriously",
+            "impact": "seeking help",
+            "consequences": ["adult involvement", "official search"]
+          },
+          {
+            "id": "choice-1c",
+            "text": "Focus on the strange girl they found",
+            "impact": "supernatural focus",
+            "consequences": ["early Eleven alliance", "different priorities"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-2",
+      "position": 2,
+      "title": "The Upside Down Discovery",
+      "context": "The group learns about the alternate dimension",
+      "sceneDescription": "Eleven reveals the existence of the Upside Down and the group must decide how to use this knowledge.",
+      "characterChoices": {
+        "eleven": [
+          {
+            "id": "choice-2a",
+            "text": "Reveal everything about Hawkins Lab immediately",
+            "impact": "full disclosure",
+            "consequences": ["complete truth", "government attention"]
+          },
+          {
+            "id": "choice-2b",
+            "text": "Only share what's necessary to save Will",
+            "impact": "selective truth",
+            "consequences": ["focused mission", "hidden dangers"]
+          },
+          {
+            "id": "choice-2c",
+            "text": "Suggest going to the Upside Down together",
+            "impact": "direct action",
+            "consequences": ["dangerous mission", "team unity"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-3",
+      "position": 3,
+      "title": "Confronting the Demogorgon",
+      "context": "The final confrontation with the monster from the Upside Down",
+      "sceneDescription": "The Demogorgon has found the group and they must work together to survive and save Will.",
+      "characterChoices": {
+        "joyce": [
+          {
+            "id": "choice-3a",
+            "text": "Trust the kids and their supernatural ally",
+            "impact": "faith in children",
+            "consequences": ["united front", "family bonds"]
+          },
+          {
+            "id": "choice-3b",
+            "text": "Try to get everyone to safety first",
+            "impact": "protective instinct",
+            "consequences": ["safety focus", "missed opportunity"]
+          },
+          {
+            "id": "choice-3c",
+            "text": "Confront Hawkins Lab directly",
+            "impact": "direct confrontation",
+            "consequences": ["government showdown", "different resolution"]
+          }
+        ]
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Will's Disappearance",
+      "context": "Will Byers goes missing after a D&D campaign. The boys discover Will is missing and must decide how to search for their friend while adults dismiss their concerns."
+    },
+    {
+      "id": 2,
+      "title": "The Upside Down Discovery",
+      "context": "The group learns about the alternate dimension. Eleven reveals the existence of the Upside Down and the group must decide how to use this knowledge."
+    },
+    {
+      "id": 3,
+      "title": "Confronting the Demogorgon",
+      "context": "The final confrontation with the monster from the Upside Down. The Demogorgon has found the group and they must work together to survive and save Will."
+    }
+  ],
+  "baseScript": "In the small town of Hawkins, Indiana, a young boy named Will Byers disappears under mysterious circumstances...",
+  "themes": ["friendship", "family", "growing up", "government conspiracy", "supernatural horror"],
+  "difficulty": "advanced",
+  "maxPlayers": 4,
+  "estimatedPlayTime": "60-80 minutes"
+}

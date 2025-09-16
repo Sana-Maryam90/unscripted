@@ -1,62 +1,154 @@
 {
   "id": "star-wars-4",
   "title": "Star Wars: A New Hope",
-  "description": "A young farm boy joins a rebellion against an evil galactic empire and discovers his destiny as a Jedi.",
-  "genre": "Sci-Fi",
+  "description": "Experience the galaxy far, far away and reshape the destiny of the Rebel Alliance. Your choices could change the fate of the Empire and the Force itself.",
+  "poster": "/images/moviePosters/Star Wars.jpg",
+  "genre": ["Sci-Fi", "Adventure", "Fantasy"],
   "duration": "121 minutes",
-  "image": "/images/movies/star-wars-4.jpg",
+  "releaseYear": 1977,
   "characters": [
     {
       "id": "luke",
       "name": "Luke Skywalker",
-      "description": "Young farm boy destined to become a Jedi",
+      "description": "A young farm boy destined to become a Jedi Knight",
       "avatar": "/images/characters/luke.jpg",
-      "personality": "hopeful, impulsive, determined"
+      "personality": "idealistic, brave, impatient, strong with the Force",
+      "background": "Raised on Tatooine, unaware of his true parentage and destiny"
     },
     {
       "id": "leia",
       "name": "Princess Leia",
-      "description": "Rebel leader fighting against the Empire",
+      "description": "Leader of the Rebel Alliance and secret twin sister to Luke",
       "avatar": "/images/characters/leia.jpg",
-      "personality": "strong-willed, diplomatic, brave"
+      "personality": "strong-willed, diplomatic, fearless, natural leader",
+      "background": "Adopted princess of Alderaan, dedicated to fighting the Empire"
     },
     {
       "id": "han",
       "name": "Han Solo",
-      "description": "Smuggler with a heart of gold",
+      "description": "Smuggler and captain of the Millennium Falcon",
       "avatar": "/images/characters/han.jpg",
-      "personality": "roguish, sarcastic, loyal"
+      "personality": "roguish, sarcastic, loyal when it matters, skeptical",
+      "background": "Independent smuggler who gets caught up in the Rebellion"
     },
     {
-      "id": "vader",
-      "name": "Darth Vader",
-      "description": "Dark Lord of the Sith",
-      "avatar": "/images/characters/vader.jpg",
-      "personality": "powerful, conflicted, intimidating"
+      "id": "obi-wan",
+      "name": "Obi-Wan Kenobi",
+      "description": "Former Jedi Knight and Luke's mentor",
+      "avatar": "/images/characters/obi-wan.jpg",
+      "personality": "wise, patient, mysterious, haunted by the past",
+      "background": "Hermit on Tatooine, watching over Luke and hiding from the Empire"
     }
   ],
   "checkpoints": [
     {
       "id": "checkpoint-1",
       "position": 1,
-      "context": "Luke discovers the message from Princess Leia",
+      "title": "The Binary Sunset",
+      "context": "Luke discovers the message from Princess Leia in R2-D2",
+      "sceneDescription": "Luke has found part of Leia's message and must decide how to proceed with this dangerous information.",
       "characterChoices": {
         "luke": [
           {
             "id": "choice-1a",
-            "text": "Immediately seek out Obi-Wan Kenobi",
-            "impact": "direct action",
-            "consequences": ["urgency", "determination"]
+            "text": "Immediately seek out Ben Kenobi",
+            "impact": "proactive heroism",
+            "consequences": ["early mentor meeting", "faster story progression"]
           },
           {
             "id": "choice-1b",
-            "text": "Return home to think about it first",
-            "impact": "cautious deliberation",
-            "consequences": ["hesitation", "family_concern"]
+            "text": "Try to convince Uncle Owen to help",
+            "impact": "family loyalty",
+            "consequences": ["family conflict", "delayed departure"]
+          },
+          {
+            "id": "choice-1c",
+            "text": "Attempt to rescue the princess alone",
+            "impact": "reckless bravery",
+            "consequences": ["dangerous solo mission", "different allies"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-2",
+      "position": 2,
+      "title": "Mos Eisley Cantina",
+      "context": "Luke and Obi-Wan need transport off Tatooine",
+      "sceneDescription": "In the cantina, they must choose how to approach potential smugglers and deal with Imperial entanglements.",
+      "characterChoices": {
+        "han": [
+          {
+            "id": "choice-2a",
+            "text": "Demand payment upfront and no questions",
+            "impact": "pure business",
+            "consequences": ["mercenary relationship", "trust issues"]
+          },
+          {
+            "id": "choice-2b",
+            "text": "Show interest in the Rebellion's cause",
+            "impact": "hidden idealism",
+            "consequences": ["early alliance", "character development"]
+          },
+          {
+            "id": "choice-2c",
+            "text": "Negotiate for a share of any reward",
+            "impact": "calculated risk",
+            "consequences": ["partnership approach", "shared stakes"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkpoint-3",
+      "position": 3,
+      "title": "Death Star Rescue",
+      "context": "The team infiltrates the Death Star to rescue Princess Leia",
+      "sceneDescription": "Plans have gone awry and the team must improvise their escape from the detention center.",
+      "characterChoices": {
+        "leia": [
+          {
+            "id": "choice-3a",
+            "text": "Take charge and lead the escape",
+            "impact": "natural leadership",
+            "consequences": ["team dynamics shift", "leadership recognition"]
+          },
+          {
+            "id": "choice-3b",
+            "text": "Suggest using the garbage chute",
+            "impact": "practical thinking",
+            "consequences": ["canonical escape", "team bonding"]
+          },
+          {
+            "id": "choice-3c",
+            "text": "Propose a direct assault approach",
+            "impact": "aggressive tactics",
+            "consequences": ["high-risk confrontation", "different escape route"]
           }
         ]
       }
     }
   ],
-  "baseScript": "In a galaxy far, far away, the evil Galactic Empire has built a massive space station capable of destroying entire planets..."
+  "scenes": [
+    {
+      "id": 1,
+      "title": "The Binary Sunset",
+      "context": "Luke discovers the message from Princess Leia in R2-D2. Luke has found part of Leia's message and must decide how to proceed with this dangerous information."
+    },
+    {
+      "id": 2,
+      "title": "Mos Eisley Cantina",
+      "context": "Luke and Obi-Wan need transport off Tatooine. In the cantina, they must choose how to approach potential smugglers and deal with Imperial entanglements."
+    },
+    {
+      "id": 3,
+      "title": "Death Star Rescue",
+      "context": "The team infiltrates the Death Star to rescue Princess Leia. Plans have gone awry and the team must improvise their escape from the detention center."
+    }
+  ],
+  "baseScript": "A long time ago in a galaxy far, far away, the evil Galactic Empire has built a space station capable of destroying entire planets...",
+  "themes": ["good vs evil", "coming of age", "destiny", "rebellion", "hope"],
+  "difficulty": "intermediate",
+  "maxPlayers": 4,
+  "estimatedPlayTime": "50-70 minutes"
 }

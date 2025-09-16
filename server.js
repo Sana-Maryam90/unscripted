@@ -23,7 +23,511 @@ const gameSessions = new Map();
 function generateFallbackBuzzerQuestions(movieId, movieData) {
     const movieTitle = movieData?.title || 'Unknown Movie';
     
-    // Predefined detailed questions for Harry Potter
+    // Detailed questions for Star Wars: A New Hope
+    if (movieId === 'star-wars-4') {
+        return [
+            {
+                id: 1,
+                question: "What planet are Luke and Owen Lars moisture farming on?",
+                options: ["Tatooine", "Alderaan", "Hoth", "Dagobah"],
+                correct: 0
+            },
+            {
+                id: 2,
+                question: "What is the name of Luke's aunt?",
+                options: ["Leia", "Beru", "Mon Mothma", "Padmé"],
+                correct: 1
+            },
+            {
+                id: 3,
+                question: "What are the exact words C-3PO says about the odds of surviving an asteroid field?",
+                options: ["'The probability is approximately 3,720 to 1'", "'Never tell me the odds!'", "'The odds are 3 million to one'", "'Approximately 1,000 to 1'"],
+                correct: 0
+            },
+            {
+                id: 4,
+                question: "What cantina does Luke and Obi-Wan go to in Mos Eisley?",
+                options: ["Mos Eisley Cantina", "Chalmun's Spaceport Cantina", "The Outlander Club", "Dexter's Diner"],
+                correct: 1
+            },
+            {
+                id: 5,
+                question: "What is the name of Han Solo's ship?",
+                options: ["Millennium Falcon", "Tantive IV", "Imperial Star Destroyer", "X-wing Fighter"],
+                correct: 0
+            },
+            {
+                id: 6,
+                question: "Who played Princess Leia in the original trilogy?",
+                options: ["Natalie Portman", "Carrie Fisher", "Daisy Ridley", "Felicity Jones"],
+                correct: 1
+            },
+            {
+                id: 7,
+                question: "What is the name of the Death Star's weakness that Luke exploits?",
+                options: ["Reactor core", "Exhaust port", "Shield generator", "Main computer"],
+                correct: 1
+            },
+            {
+                id: 8,
+                question: "What does Obi-Wan tell Luke about his father's death?",
+                options: ["He died in the Clone Wars", "Vader betrayed and murdered him", "He died in a speeder accident", "He was killed by Tusken Raiders"],
+                correct: 1
+            },
+            {
+                id: 9,
+                question: "What type of weapon does a Jedi use?",
+                options: ["Blaster", "Vibroblade", "Lightsaber", "Force Pike"],
+                correct: 2
+            },
+            {
+                id: 10,
+                question: "What is the name of the space station bar where Han shoots Greedo?",
+                options: ["Jabba's Palace", "Mos Eisley Cantina", "Cloud City", "Echo Base"],
+                correct: 1
+            },
+            {
+                id: 11,
+                question: "What does Han Solo get frozen in at the end of Empire Strikes Back?",
+                options: ["Ice", "Carbonite", "Crystal", "Metal"],
+                correct: 1
+            },
+            {
+                id: 12,
+                question: "What planet is Princess Leia from?",
+                options: ["Naboo", "Coruscant", "Alderaan", "Tatooine"],
+                correct: 2
+            },
+            {
+                id: 13,
+                question: "What is Darth Vader's real name?",
+                options: ["Anakin Skywalker", "Ben Kenobi", "Owen Lars", "Mace Windu"],
+                correct: 0
+            },
+            {
+                id: 14,
+                question: "What color is Luke's lightsaber in A New Hope?",
+                options: ["Red", "Green", "Blue", "Purple"],
+                correct: 2
+            },
+            {
+                id: 15,
+                question: "Who is the leader of the Rebel Alliance?",
+                options: ["Princess Leia", "Mon Mothma", "General Rieekan", "Admiral Ackbar"],
+                correct: 1
+            },
+            {
+                id: 16,
+                question: "What creature lives in the trash compactor on the Death Star?",
+                options: ["Sarlacc", "Dianoga", "Rancor", "Nexu"],
+                correct: 1
+            },
+            {
+                id: 17,
+                question: "What is the name of Luke's home planet's twin suns?",
+                options: ["Tatoo I and Tatoo II", "Binary Sunset", "Tatooine A and B", "The film never specifies"],
+                correct: 0
+            },
+            {
+                id: 18,
+                question: "What does Han Solo claim the Millennium Falcon can do?",
+                options: ["Jump to hyperspace in 12 parsecs", "Make the Kessel Run in less than 12 parsecs", "Outrun Imperial starships", "Carry 1000 tons of cargo"],
+                correct: 1
+            },
+            {
+                id: 19,
+                question: "What is the call sign of Luke's X-wing fighter?",
+                options: ["Red Five", "Red Leader", "Gold Leader", "Blue Squadron"],
+                correct: 0
+            },
+            {
+                id: 20,
+                question: "Who composed the music for Star Wars?",
+                options: ["Hans Zimmer", "Danny Elfman", "John Williams", "Alan Silvestri"],
+                correct: 2
+            }
+        ];
+    }
+
+    // Detailed questions for Bridge to Terabithia
+    if (movieId === 'bridge-to-terabithia') {
+        return [
+            {
+                id: 1,
+                question: "What is the name of the imaginary kingdom that Jess and Leslie create?",
+                options: ["Narnia", "Terabithia", "Neverland", "Wonderland"],
+                correct: 1
+            },
+            {
+                id: 2,
+                question: "What does Jess want to be the fastest runner in?",
+                options: ["His school", "Fifth grade", "The county", "His neighborhood"],
+                correct: 1
+            },
+            {
+                id: 3,
+                question: "What is Leslie's family situation when she moves to town?",
+                options: ["Her parents are divorced", "Her family is wealthy and intellectual", "She lives with grandparents", "Her father is in the military"],
+                correct: 1
+            },
+            {
+                id: 4,
+                question: "How do Jess and Leslie get to Terabithia?",
+                options: ["By crossing a stream on a rope", "Through a secret door", "By climbing a tree", "Through a tunnel"],
+                correct: 0
+            },
+            {
+                id: 5,
+                question: "What does Jess love to do in his free time?",
+                options: ["Read books", "Play video games", "Draw and paint", "Play sports"],
+                correct: 2
+            },
+            {
+                id: 6,
+                question: "Who plays Leslie Burke in the 2007 film?",
+                options: ["AnnaSophia Robb", "Dakota Fanning", "Emma Watson", "Abigail Breslin"],
+                correct: 0
+            },
+            {
+                id: 7,
+                question: "What tragic event happens to Leslie?",
+                options: ["She moves away", "She gets very sick", "She drowns trying to cross to Terabithia alone", "She has an accident at school"],
+                correct: 2
+            },
+            {
+                id: 8,
+                question: "What is the name of Jess's younger sister?",
+                options: ["Joyce Ann", "May Belle", "Ellie", "Brenda"],
+                correct: 1
+            },
+            {
+                id: 9,
+                question: "Where does Jess go on the day Leslie dies?",
+                options: ["To school", "To the Smithsonian with his teacher", "To visit relatives", "To the doctor"],
+                correct: 1
+            },
+            {
+                id: 10,
+                question: "What does Jess build at the end of the story?",
+                options: ["A treehouse", "A bridge to Terabithia", "A memorial garden", "A new rope swing"],
+                correct: 1
+            },
+            {
+                id: 11,
+                question: "What is the name of Jess's art teacher?",
+                options: ["Miss Edwards", "Ms. Myers", "Mrs. Johnson", "Miss Edmunds"],
+                correct: 3
+            },
+            {
+                id: 12,
+                question: "What kind of creatures do Jess and Leslie imagine in Terabithia?",
+                options: ["Dragons and unicorns", "Dark Masters and other magical beings", "Talking animals", "Fairies and elves"],
+                correct: 1
+            },
+            {
+                id: 13,
+                question: "What does Leslie give Jess for Christmas?",
+                options: ["Art supplies", "A book", "A dog", "A friendship bracelet"],
+                correct: 0
+            },
+            {
+                id: 14,
+                question: "Who wrote the original novel 'Bridge to Terabithia'?",
+                options: ["Roald Dahl", "Katherine Paterson", "Judy Blume", "Louis Sachar"],
+                correct: 1
+            },
+            {
+                id: 15,
+                question: "What happens to the rope that Jess and Leslie use to swing across the creek?",
+                options: ["It gets stolen", "It breaks while Leslie is using it", "Jess cuts it down", "It rots and becomes dangerous"],
+                correct: 1
+            },
+            {
+                id: 16,
+                question: "What does Jess's father do for work?",
+                options: ["He's a farmer", "He works construction", "He's a mechanic", "He's unemployed"],
+                correct: 1
+            },
+            {
+                id: 17,
+                question: "What is Leslie's attitude toward school bullies?",
+                options: ["She's afraid of them", "She confronts them bravely", "She ignores them", "She tells teachers"],
+                correct: 1
+            },
+            {
+                id: 18,
+                question: "What does Jess initially think about Leslie when she beats him in the race?",
+                options: ["He admires her", "He's angry and embarrassed", "He wants to be friends", "He doesn't care"],
+                correct: 1
+            },
+            {
+                id: 19,
+                question: "What does Leslie's father do for a living?",
+                options: ["He's a teacher", "He's a writer", "He's a doctor", "He's a lawyer"],
+                correct: 1
+            },
+            {
+                id: 20,
+                question: "How does Jess honor Leslie's memory at the end?",
+                options: ["By continuing to visit Terabithia alone", "By building a bridge and making May Belle the new queen", "By writing a story about her", "By planting a garden"],
+                correct: 1
+            }
+        ];
+    }
+
+    // Detailed questions for Diary of a Wimpy Kid
+    if (movieId === 'diary-of-wimpy-kid') {
+        return [
+            {
+                id: 1,
+                question: "What is the name of the main character in Diary of a Wimpy Kid?",
+                options: ["Gary Heffley", "Greg Heffley", "Grant Heffley", "Glenn Heffley"],
+                correct: 1
+            },
+            {
+                id: 2,
+                question: "What is the name of Greg's best friend?",
+                options: ["Rowley Jefferson", "Robert Jackson", "Riley Johnson", "Ricky James"],
+                correct: 0
+            },
+            {
+                id: 3,
+                question: "What does Greg call his diary to make it sound more masculine?",
+                options: ["A journal", "A log book", "A record", "A notebook"],
+                correct: 0
+            },
+            {
+                id: 4,
+                question: "What is the name of Greg's older brother?",
+                options: ["Rodrick", "Richard", "Robert", "Raymond"],
+                correct: 0
+            },
+            {
+                id: 5,
+                question: "What instrument does Rodrick play?",
+                options: ["Guitar", "Bass", "Drums", "Keyboard"],
+                correct: 2
+            },
+            {
+                id: 6,
+                question: "What is the name of Rodrick's band?",
+                options: ["Loaded Diaper", "Heavy Metal", "Rock Bottom", "Noise Makers"],
+                correct: 0
+            },
+            {
+                id: 7,
+                question: "What is Greg's younger brother's name?",
+                options: ["Manny", "Mark", "Matt", "Mike"],
+                correct: 0
+            },
+            {
+                id: 8,
+                question: "What does Greg want to become when he grows up?",
+                options: ["Rich and famous", "A doctor", "A teacher", "A writer"],
+                correct: 0
+            },
+            {
+                id: 9,
+                question: "What is the name of Greg's school?",
+                options: ["Westmore Middle School", "Crossland Middle School", "Plainview Middle School", "The name is never mentioned"],
+                correct: 3
+            },
+            {
+                id: 10,
+                question: "What game do Greg and Rowley create that gets them in trouble?",
+                options: ["The Cheese Game", "Zoo-Wee-Mama", "Big Wheel Racing", "The Safety Patrol Game"],
+                correct: 2
+            },
+            {
+                id: 11,
+                question: "What is Greg afraid of in the school bathroom?",
+                options: ["The cheese", "Older kids", "Getting wet", "Being late to class"],
+                correct: 1
+            },
+            {
+                id: 12,
+                question: "What does Greg do to try to become more popular?",
+                options: ["Join the wrestling team", "Run for class president", "Join various clubs and activities", "Start a band"],
+                correct: 2
+            },
+            {
+                id: 13,
+                question: "What happens to Rowley's hand?",
+                options: ["He breaks it playing football", "He breaks it falling off his bike during their Big Wheel game", "He sprains it in gym class", "He cuts it on broken glass"],
+                correct: 1
+            },
+            {
+                id: 14,
+                question: "Who created the Diary of a Wimpy Kid series?",
+                options: ["Jeff Kinney", "Rick Riordan", "James Patterson", "Gordon Korman"],
+                correct: 0
+            },
+            {
+                id: 15,
+                question: "What is the 'Cheese Touch' at Greg's school?",
+                options: ["A game the kids play", "A curse involving moldy cheese on the basketball court", "A cafeteria food rule", "A teacher's punishment"],
+                correct: 1
+            },
+            {
+                id: 16,
+                question: "What does Greg's mom make him do that embarrasses him?",
+                options: ["Join the school play", "Take dance lessons", "Wear his winter coat", "All of the above"],
+                correct: 3
+            },
+            {
+                id: 17,
+                question: "What position does Greg want in the Safety Patrol?",
+                options: ["Lieutenant", "Captain", "Sergeant", "He doesn't want to join"],
+                correct: 0
+            },
+            {
+                id: 18,
+                question: "What does Greg plan to do with his best friend when they grow up?",
+                options: ["Start a business together", "Be roommates", "Rowley will be his biographer", "Go to the same college"],
+                correct: 2
+            },
+            {
+                id: 19,
+                question: "What does Greg think about middle school before he starts?",
+                options: ["He's nervous", "He thinks it will be easy", "He's excited", "He wants to skip it"],
+                correct: 1
+            },
+            {
+                id: 20,
+                question: "What ultimately happens with Greg and Rowley's friendship?",
+                options: ["They stop being friends", "They become closer after working through their problems", "Rowley moves away", "They only see each other at school"],
+                correct: 1
+            }
+        ];
+    }
+
+    // Detailed questions for Stranger Things Season 1
+    if (movieId === 'stranger-things-1') {
+        return [
+            {
+                id: 1,
+                question: "What is the name of the town where Stranger Things takes place?",
+                options: ["Hawkins, Indiana", "Hawkins, Illinois", "Hawthorne, Indiana", "Harrison, Indiana"],
+                correct: 0
+            },
+            {
+                id: 2,
+                question: "What game are the boys playing when Will Byers disappears?",
+                options: ["Monopoly", "Risk", "Dungeons & Dragons", "Scrabble"],
+                correct: 2
+            },
+            {
+                id: 3,
+                question: "What is Eleven's real name?",
+                options: ["Jane Hopper", "Jane Ives", "Jennifer Ives", "Jean Hopper"],
+                correct: 1
+            },
+            {
+                id: 4,
+                question: "What food does Eleven become obsessed with?",
+                options: ["Pizza", "Hamburgers", "Eggo waffles", "Ice cream"],
+                correct: 2
+            },
+            {
+                id: 5,
+                question: "What is the name of the alternate dimension?",
+                options: ["The Shadow Realm", "The Dark Side", "The Upside Down", "The Other Side"],
+                correct: 2
+            },
+            {
+                id: 6,
+                question: "Who plays Joyce Byers, Will's mother?",
+                options: ["Winona Ryder", "Sarah Jessica Parker", "Julianne Moore", "Helen Hunt"],
+                correct: 0
+            },
+            {
+                id: 7,
+                question: "What is the name of the monster in Season 1?",
+                options: ["The Mind Flayer", "The Demogorgon", "The Shadow Monster", "The Beast"],
+                correct: 1
+            },
+            {
+                id: 8,
+                question: "Where does Eleven first encounter the boys?",
+                options: ["The school", "Benny's Burgers", "The middle school gym", "The woods"],
+                correct: 1
+            },
+            {
+                id: 9,
+                question: "What is Chief Hopper's first name?",
+                options: ["James", "Jim", "John", "Jack"],
+                correct: 1
+            },
+            {
+                id: 10,
+                question: "What year is Stranger Things Season 1 set in?",
+                options: ["1982", "1983", "1984", "1985"],
+                correct: 1
+            },
+            {
+                id: 11,
+                question: "What is the name of the government lab?",
+                options: ["Hawkins National Laboratory", "Hawkins Research Facility", "Hawkins Institute", "Hawkins Science Center"],
+                correct: 0
+            },
+            {
+                id: 12,
+                question: "Who is Nancy Wheeler's best friend?",
+                options: ["Barbara Holland", "Carol Perkins", "Tina", "Robin Buckley"],
+                correct: 0
+            },
+            {
+                id: 13,
+                question: "What does Joyce use to communicate with Will?",
+                options: ["A radio", "Christmas lights", "A telephone", "Morse code"],
+                correct: 1
+            },
+            {
+                id: 14,
+                question: "What is Dustin's last name?",
+                options: ["Henderson", "Harrison", "Hoffman", "Hendricks"],
+                correct: 0
+            },
+            {
+                id: 15,
+                question: "Who plays Eleven?",
+                options: ["Sadie Sink", "Millie Bobby Brown", "Maya Hawke", "Natalia Dyer"],
+                correct: 1
+            },
+            {
+                id: 16,
+                question: "What happens to Barb at Steve's party?",
+                options: ["She leaves early", "She gets taken by the Demogorgon", "She gets grounded", "She falls asleep"],
+                correct: 1
+            },
+            {
+                id: 17,
+                question: "What power does Eleven have?",
+                options: ["Super strength", "Telepathy and telekinesis", "Invisibility", "Time travel"],
+                correct: 1
+            },
+            {
+                id: 18,
+                question: "Where is Will found at the end of Season 1?",
+                options: ["In the Upside Down", "At the quarry", "In the lab", "At Castle Byers"],
+                correct: 0
+            },
+            {
+                id: 19,
+                question: "What does Will cough up at the very end of Season 1?",
+                options: ["Blood", "A slug-like creature", "Black liquid", "Nothing"],
+                correct: 1
+            },
+            {
+                id: 20,
+                question: "Who created Stranger Things?",
+                options: ["The Russo Brothers", "The Duffer Brothers", "The Wachowski Brothers", "The Coen Brothers"],
+                correct: 1
+            }
+        ];
+    }
+    
+    // Predefined detailed questions for Harry Potter (keeping the existing ones)
     if (movieId === 'harry-potter-1') {
         return [
             {

@@ -12,7 +12,6 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(300);
   const [visibleSegments, setVisibleSegments] = useState(0);
   const [showChoices, setShowChoices] = useState(false);
   const storyRef = useRef(null);
@@ -29,7 +28,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
             id: 'base-content',
             type: 'narrative',
             content: storyState.baseContent || `Welcome to ${session.movieTitle}! Your adventure begins...`,
-            image: getRandomArtStyleImage(),
+            image: getRandomArtStyleImage(), // This will use HogwartsCrest
             timestamp: new Date(),
             side: 'center',
             isBaseContent: true
@@ -89,14 +88,6 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
   useEffect(() => {
     setIsMyTurn(session.currentTurn === currentPlayer.id);
   }, [session.currentTurn, currentPlayer.id]);
-
-  // Turn timer
-  useEffect(() => {
-    if (isMyTurn && timeLeft > 0 && currentChoices.length > 0) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [isMyTurn, timeLeft, currentChoices.length]);
 
   // Auto-scroll to latest content
   useEffect(() => {
@@ -165,7 +156,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
           id: `ai-${Date.now()}`,
           type: 'narrative',
           content: result.newSegment.content,
-          image: getRandomArtStyleImage(),
+          image: getRandomHarryPotterImage(), // Use random Harry Potter images for story segments
           timestamp: new Date(),
           side: (storySegments.length + 1) % 2 === 0 ? 'left' : 'right',
           aiGenerated: true
@@ -224,7 +215,6 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
           }
           setIsLoading(false);
           setSelectedChoice(null);
-          setTimeLeft(300);
         }, 2500);
 
         // Update session with new story state
@@ -250,7 +240,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
           id: `fallback-${Date.now()}`,
           type: 'narrative',
           content: `The magical world responds to your decision. ${choice.text.replace('I ', 'You ')}. The story continues as new possibilities unfold, and the ancient magic of Hogwarts seems to pulse with renewed energy around you...`,
-          image: getRandomArtStyleImage(),
+          image: getRandomHarryPotterImage(), // Use random Harry Potter images for story segments
           timestamp: new Date(),
           side: (storySegments.length + 1) % 2 === 0 ? 'left' : 'right',
           fallback: true
@@ -291,16 +281,21 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
   };
 
   const getRandomArtStyleImage = () => {
-    // Use images from steering/artStyle directory as per requirements
-    const artStyleImages = [
-      '/artStyle/pixel1.png',
-      '/artStyle/pixel2.png',
-      '/artStyle/pixel3.png',
-      '/artStyle/pixel4.png',
-      '/artStyle/Code_Generated_Image.png',
-      '/artStyle/artStyle.png'
+    // Always use HogwartsCrest as the main image
+    return '/harryPotter/HogwartsCrest.png';
+  };
+
+  const getRandomHarryPotterImage = () => {
+    // Use images from harryPotter directory (excluding HogwartsCrest which is used as main)
+    const harryPotterImages = [
+      '/harryPotter/dobby.png',
+      '/harryPotter/Snitch.png',
+      '/harryPotter/sortingHat.png',
+      '/harryPotter/hedwig.png',
+      '/harryPotter/harry.png',
+      '/harryPotter/hagrid.png'
     ];
-    return artStyleImages[Math.floor(Math.random() * artStyleImages.length)];
+    return harryPotterImages[Math.floor(Math.random() * harryPotterImages.length)];
   };
 
   const generateFallbackChoices = () => {
@@ -380,12 +375,6 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
     
     const choices = characterChoices[characterName] || defaultChoices;
     return choices.map(choice => ({ ...choice, character: characterName, fallback: true }));
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const currentTurnPlayer = session.players?.find(p => p.id === session.currentTurn);
@@ -636,6 +625,7 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
           
           <motion.h1 
             className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-wide"
+            style={{ fontFamily: 'ByteBounce, cursive' }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -674,7 +664,6 @@ const StoryPage = ({ session, currentPlayer, onSessionUpdate, onBack, isSoloMode
               <div className="inline-flex items-center space-x-3 bg-emerald-500/20 border border-emerald-500/50 rounded-full px-6 py-3 backdrop-blur-sm">
                 <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
                 <span className="text-emerald-400 font-medium">Your Turn</span>
-                <span className="text-amber-400">({formatTime(timeLeft)})</span>
               </div>
             ) : (
               <div className="inline-flex items-center space-x-3 bg-amber-500/20 border border-amber-500/50 rounded-full px-6 py-3 backdrop-blur-sm">
